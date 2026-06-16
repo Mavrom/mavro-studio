@@ -135,7 +135,10 @@
     "birthday": "Birthday",
     "info": "Info",
     "notes": "Notes",
-    "selectDate": "Select date"
+    "selectDate": "Select date",
+    "censorOn": "Censor Mode: On",
+    "censorOff": "Censor Mode: Off",
+    "unnamed": "Unnamed"
   },
   "security": {
     "title": "Security",

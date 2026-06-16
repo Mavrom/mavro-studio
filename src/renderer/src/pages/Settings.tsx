@@ -41,7 +41,7 @@ function SCard({ title, color, children }: { title: string; color: string; child
 }
 
 export default function Settings() {
-  const { t, theme, setTheme, language, setLanguage, addToast } = useAppStore()
+  const { t, language, setLanguage, addToast } = useAppStore()
   const [section, setSection] = useState<Section>('general')
   const [checkingUpdate, setCheckingUpdate] = useState(false)
 
@@ -138,11 +138,7 @@ export default function Settings() {
     }
   }
 
-  const themeOptions = [
-    { value: 'dark' as const,   label: t('settings.themeDark') },
-    { value: 'light' as const,  label: t('settings.themeLight') },
-    { value: 'system' as const, label: t('settings.themeSystem') },
-  ]
+
 
   return (
     <div className="animate-fade-in" style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
@@ -207,29 +203,6 @@ export default function Settings() {
                 </select>
               </SCard>
 
-              <SCard title={t('settings.theme')} color="var(--accent-purple)">
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-                  {themeOptions.map(opt => (
-                    <button
-                      key={opt.value}
-                      onClick={() => setTheme(opt.value)}
-                      style={{
-                        padding: '10px',
-                        borderRadius: 'var(--radius-md)',
-                        border: theme === opt.value ? '1.5px solid var(--accent-purple)' : '1px solid var(--border-primary)',
-                        background: theme === opt.value ? 'var(--accent-purple-glow)' : 'var(--bg-secondary)',
-                        color: theme === opt.value ? 'var(--accent-purple)' : 'var(--text-secondary)',
-                        cursor: 'pointer',
-                        fontSize: 'var(--font-sm)',
-                        fontWeight: theme === opt.value ? 600 : 400,
-                        transition: 'all 0.12s',
-                      }}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </SCard>
 
               <SCard title={t('settings.autoStart')} color="var(--accent-success)">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

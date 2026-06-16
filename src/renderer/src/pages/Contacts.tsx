@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAppStore } from '../store'
-import { Search, Plus, Trash2, Edit2, User, Key, Phone, Calendar, Info } from 'lucide-react'
+import { Search, Plus, Trash2, Edit2, User, Key, Phone, Calendar, Info, Eye, EyeOff } from 'lucide-react'
 
 interface Contact {
   id: string
@@ -14,18 +14,36 @@ interface Contact {
 
 const DEFAULT_CONTACTS: Contact[] = []
 
-// ── Name Obfuscation Function ──
+// ── Privacy Masking Functions ──
 function maskName(fullName: string): string {
   if (!fullName) return ''
   const parts = fullName.trim().split(/\s+/)
   if (parts.length < 2) {
-    return fullName
+    return '*****'
   }
-  const lastName = parts[parts.length - 1]
-  const firstLetter = lastName.charAt(0)
-  const maskedLastName = firstLetter + '*'.repeat(Math.max(0, lastName.length - 1))
-  const otherParts = parts.slice(0, parts.length - 1).join(' ')
-  return `${otherParts} ${maskedLastName}`
+  return parts.slice(0, -1).join(' ') + ' *****'
+}
+
+function maskUsername(username: string): string {
+  if (!username) return ''
+  return username.charAt(0) + '*****'
+}
+
+function maskId(id: string): string {
+  if (!id) return ''
+  if (id.length <= 6) return '***'
+  return id.slice(0, 3) + '*'.repeat(id.length - 6) + id.slice(-3)
+}
+
+function maskPhone(phone: string): string {
+  if (!phone) return ''
+  if (phone.length <= 5) return '***'
+  return phone.slice(0, 3) + '*'.repeat(phone.length - 5) + phone.slice(-2)
+}
+
+function maskInfo(info: string): string {
+  if (!info) return ''
+  return '*****'
 }
 
 // ── Custom Date Picker component ──
@@ -234,6 +252,7 @@ export default function Contacts() {
   const [phone, setPhone] = useState('')
   const [birthday, setBirthday] = useState('')
   const [info, setInfo] = useState('')
+  const [censorEnabled, setCensorEnabled] = useState(true)
 
   useEffect(() => {
     const load = async () => {
@@ -269,33 +288,36 @@ export default function Contacts() {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name.trim() || !username.trim() || !customId.trim() || !birthday) {
-      addToast({ message: 'Lütfen zorunlu alanları doldurun (Adı Soyadı, Kullanıcı Adı, ID, Doğum Günü)', type: 'error' })
-      return
-    }
+    
+    const finalName = name.trim() || t('contacts.unnamed')
+    const finalUsername = username.trim()
+    const finalCustomId = customId.trim() || `ID-${Math.floor(1000 + Math.random() * 9000)}`
+    const finalPhone = phone.trim()
+    const finalBirthday = birthday || ''
+    const finalInfo = info.trim()
 
     if (editContactId) {
       // Edit Mode
       setContacts(prev => prev.map(c => c.id === editContactId ? {
         id: editContactId,
-        name: name.trim(),
-        username: username.trim(),
-        customId: customId.trim(),
-        phone: phone.trim(),
-        birthday,
-        info: info.trim()
+        name: finalName,
+        username: finalUsername,
+        customId: finalCustomId,
+        phone: finalPhone,
+        birthday: finalBirthday,
+        info: finalInfo
       } : c))
       addToast({ message: 'Kişi başarıyla güncellendi', type: 'success' })
     } else {
       // Add Mode
       const newContact: Contact = {
         id: crypto.randomUUID(),
-        name: name.trim(),
-        username: username.trim(),
-        customId: customId.trim(),
-        phone: phone.trim(),
-        birthday,
-        info: info.trim()
+        name: finalName,
+        username: finalUsername,
+        customId: finalCustomId,
+        phone: finalPhone,
+        birthday: finalBirthday,
+        info: finalInfo
       }
       setContacts(prev => [...prev, newContact])
       addToast({ message: 'Yeni kişi eklendi', type: 'success' })
@@ -363,8 +385,8 @@ export default function Contacts() {
         </button>
       </div>
 
-      <div className="top-nav">
-        <div className="search-input-wrapper w-full">
+      <div className="top-nav" style={{ gap: 'var(--space-3)' }}>
+        <div className="search-input-wrapper" style={{ flex: 1 }}>
           <Search size={16} />
           <input
             type="text"
@@ -374,6 +396,15 @@ export default function Contacts() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
+        <button
+          className="btn btn-secondary"
+          onClick={() => setCensorEnabled(!censorEnabled)}
+          title={censorEnabled ? t('contacts.censorOff') : t('contacts.censorOn')}
+          type="button"
+        >
+          {censorEnabled ? <EyeOff size={16} /> : <Eye size={16} />}
+          <span>{censorEnabled ? t('contacts.censorOff') : t('contacts.censorOn')}</span>
+        </button>
       </div>
 
       <div className="page-content mt-6 flex flex-col gap-6">
@@ -385,33 +416,30 @@ export default function Contacts() {
             </h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
               <div className="form-group">
-                <label className="form-label">{t('contacts.name')} *</label>
+                <label className="form-label">{t('contacts.name')}</label>
                 <input
                   type="text"
                   className="input"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  required
                 />
               </div>
               <div className="form-group">
-                <label className="form-label">{t('contacts.username')} *</label>
+                <label className="form-label">{t('contacts.username')}</label>
                 <input
                   type="text"
                   className="input"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  required
                 />
               </div>
               <div className="form-group">
-                <label className="form-label">{t('contacts.customId')} *</label>
+                <label className="form-label">{t('contacts.customId')}</label>
                 <input
                   type="text"
                   className="input"
                   value={customId}
                   onChange={(e) => setCustomId(e.target.value)}
-                  required
                 />
               </div>
               <div className="form-group">
@@ -424,7 +452,7 @@ export default function Contacts() {
                 />
               </div>
               <div className="form-group">
-                <label className="form-label">{t('contacts.birthday')} *</label>
+                <label className="form-label">{t('contacts.birthday')}</label>
                 <DatePicker
                   value={birthday}
                   onChange={(dateStr) => setBirthday(dateStr)}
@@ -487,63 +515,71 @@ export default function Contacts() {
                 </tr>
               </thead>
               <tbody>
-                {filteredContacts.map((c) => (
-                  <tr key={c.id}>
-                    <td>
-                      <div className="flex items-center gap-2 font-bold" title={c.name}>
-                        {maskName(c.name)}
-                      </div>
-                    </td>
-                    <td>
-                      <div className="flex items-center gap-1 text-muted">
-                        <User size={12} />
-                        <span>{c.username}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="flex items-center gap-1 text-muted">
-                        <Key size={12} />
-                        <span>{c.customId}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="flex items-center gap-1 text-muted">
-                        <Phone size={12} />
-                        <span>{c.phone || '-'}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="flex items-center gap-1 text-muted">
-                        <Calendar size={12} />
-                        <span>{c.birthday}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="flex items-center gap-1 text-muted" title={c.info} style={{ maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        <Info size={12} />
-                        <span>{c.info || '-'}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="flex justify-center gap-2">
-                        <button
-                          className="btn btn-secondary btn-sm btn-icon"
-                          style={{ width: 26, height: 26 }}
-                          onClick={() => handleEditInit(c)}
-                        >
-                          <Edit2 size={12} />
-                        </button>
-                        <button
-                          className="btn btn-danger btn-sm btn-icon"
-                          style={{ width: 26, height: 26 }}
-                          onClick={() => handleDelete(c.id)}
-                        >
-                          <Trash2 size={12} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {filteredContacts.map((c) => {
+                  const displayName = censorEnabled ? maskName(c.name) : c.name
+                  const displayUsername = censorEnabled ? maskUsername(c.username) : (c.username || '-')
+                  const displayCustomId = censorEnabled ? maskId(c.customId) : (c.customId || '-')
+                  const displayPhone = censorEnabled ? maskPhone(c.phone) : (c.phone || '-')
+                  const displayInfo = censorEnabled ? maskInfo(c.info) : (c.info || '-')
+
+                  return (
+                    <tr key={c.id}>
+                      <td>
+                        <div className="flex items-center gap-2 font-bold" title={c.name}>
+                          {displayName}
+                        </div>
+                      </td>
+                      <td>
+                        <div className="flex items-center gap-1 text-muted">
+                          <User size={12} />
+                          <span>{displayUsername}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="flex items-center gap-1 text-muted">
+                          <Key size={12} />
+                          <span>{displayCustomId}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="flex items-center gap-1 text-muted">
+                          <Phone size={12} />
+                          <span>{displayPhone}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="flex items-center gap-1 text-muted">
+                          <Calendar size={12} />
+                          <span>{c.birthday || '-'}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="flex items-center gap-1 text-muted" title={c.info} style={{ maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <Info size={12} />
+                          <span>{displayInfo}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="flex justify-center gap-2">
+                          <button
+                            className="btn btn-secondary btn-sm btn-icon"
+                            style={{ width: 26, height: 26 }}
+                            onClick={() => handleEditInit(c)}
+                          >
+                            <Edit2 size={12} />
+                          </button>
+                          <button
+                            className="btn btn-danger btn-sm btn-icon"
+                            style={{ width: 26, height: 26 }}
+                            onClick={() => handleDelete(c.id)}
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>

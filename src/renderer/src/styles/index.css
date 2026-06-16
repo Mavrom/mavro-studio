@@ -13,15 +13,15 @@
 /* =================== CSS VARIABLES =================== */
 :root {
   /* — Background Colors — */
-  --bg-primary: #0a0e14;
-  --bg-secondary: #111720;
-  --bg-tertiary: #161d2a;
-  --bg-elevated: #1a2234;
-  --bg-hover: #1e2940;
-  --bg-active: #243352;
-  --bg-input: #131a26;
-  --bg-sidebar: #0d1219;
-  --bg-card: rgba(17, 23, 32, 0.85);
+  --bg-primary: #020202;      /* Onyx */
+  --bg-secondary: #17181A;    /* Oblivion */
+  --bg-tertiary: #1D1E21;
+  --bg-elevated: #242529;
+  --bg-hover: #2B2C30;
+  --bg-active: #323338;
+  --bg-input: #0E0F10;
+  --bg-sidebar: #020202;      /* Onyx */
+  --bg-card: rgba(23, 24, 26, 0.85); /* Oblivion */
 
   /* — Accent Colors — */
   --accent-primary: #4f8fff;
@@ -119,30 +119,30 @@
 
 /* =================== LIGHT THEME =================== */
 [data-theme="light"] {
-  --bg-primary: #f5f7fa;
-  --bg-secondary: #ffffff;
-  --bg-tertiary: #f0f2f5;
-  --bg-elevated: #ffffff;
-  --bg-hover: #e8ebf0;
-  --bg-active: #dde2ea;
-  --bg-input: #f0f2f5;
-  --bg-sidebar: #ffffff;
-  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-primary: #020202;
+  --bg-secondary: #17181A;
+  --bg-tertiary: #1D1E21;
+  --bg-elevated: #242529;
+  --bg-hover: #2B2C30;
+  --bg-active: #323338;
+  --bg-input: #0E0F10;
+  --bg-sidebar: #020202;
+  --bg-card: rgba(23, 24, 26, 0.85);
 
-  --text-primary: #1a1f2e;
-  --text-secondary: #5a6577;
-  --text-muted: #9aa5b4;
-  --text-inverse: #ffffff;
+  --text-primary: #e8edf5;
+  --text-secondary: #8899b0;
+  --text-muted: #4d5f77;
+  --text-inverse: #0a0e14;
 
-  --border-primary: rgba(0, 0, 0, 0.08);
-  --border-secondary: rgba(0, 0, 0, 0.12);
-  --glass-bg: rgba(255, 255, 255, 0.75);
-  --glass-border: rgba(0, 0, 0, 0.06);
+  --border-primary: rgba(255, 255, 255, 0.06);
+  --border-secondary: rgba(255, 255, 255, 0.1);
+  --glass-bg: rgba(23, 24, 26, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.05);
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 /* =================== BASE STYLES =================== */

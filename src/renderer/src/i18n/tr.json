@@ -135,7 +135,10 @@
     "birthday": "Doğum Günü",
     "info": "Info",
     "notes": "Notlar",
-    "selectDate": "Tarih seçin"
+    "selectDate": "Tarih seçin",
+    "censorOn": "Sansür Modu: Açık",
+    "censorOff": "Sansür Modu: Kapalı",
+    "unnamed": "İsimsiz"
   },
   "security": {
     "title": "Güvenlik",

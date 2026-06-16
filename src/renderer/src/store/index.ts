@@ -66,9 +66,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   // Theme
   theme: 'dark',
   setTheme: (theme) => {
-    set({ theme })
-    document.documentElement.setAttribute('data-theme', theme === 'system' ? 'dark' : theme)
-    window.api?.setTheme(theme)
+    set({ theme: 'dark' })
+    document.documentElement.setAttribute('data-theme', 'dark')
+    window.api?.setTheme('dark')
   },
 
   // Language
