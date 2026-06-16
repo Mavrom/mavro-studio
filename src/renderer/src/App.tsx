@@ -11,7 +11,6 @@ import Projects from './pages/Projects'
 import Notes from './pages/Notes'
 import Contacts from './pages/Contacts'
 import Settings from './pages/Settings'
-import BackButton from './components/common/BackButton'
 
 function App() {
   const { activePage, setTheme, setLanguage, setActivePage } = useAppStore()
@@ -80,11 +79,6 @@ function App() {
       <div className="app-container">
         {showSidebar && <Sidebar />}
         <main className="main-content">
-          {!showSidebar && (
-            <div style={{ padding: 'var(--space-4) var(--space-8) 0', display: 'flex', alignItems: 'center' }}>
-              <BackButton onClick={() => setActivePage('home')} />
-            </div>
-          )}
           {renderPage()}
         </main>
       </div>
