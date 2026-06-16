@@ -217,8 +217,8 @@ export default function Dashboard() {
                 <span>{t('nav.contacts')}</span>
                 <Users2 size={14} />
               </button>
-              <button className="btn btn-secondary text-left w-full justify-between" onClick={() => setActivePage('analytics')}>
-                <span>{t('nav.analytics')}</span>
+              <button className="btn btn-secondary text-left w-full justify-between" onClick={() => setActivePage('settings')}>
+                <span>{t('nav.settings')}</span>
                 <Plus size={14} />
               </button>
             </div>

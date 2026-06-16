@@ -181,7 +181,11 @@ ipcMain.handle('dialog:openFile', async (_event, filters?: Electron.FileFilter[]
 ipcMain.handle('updater:check', async () => {
   try {
     const result = await autoUpdater.checkForUpdates()
-    return result?.updateInfo || null
+    if (!result?.updateInfo) return null
+    const currentVersion = app.getVersion()
+    const latestVersion = result.updateInfo.version
+    if (latestVersion === currentVersion) return null
+    return result.updateInfo
   } catch {
     return null
   }

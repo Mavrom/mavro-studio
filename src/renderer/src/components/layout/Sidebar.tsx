@@ -3,8 +3,6 @@ import {
   LayoutDashboard,
   FolderGit2,
   FileText,
-  BarChart3,
-  Wrench,
   Users2,
   ShieldCheck,
   Settings,
@@ -72,16 +70,6 @@ export default function Sidebar() {
           page="notes"
           icon={<FileText />}
           label={t('nav.notes')}
-        />
-        <SidebarItem
-          page="analytics"
-          icon={<BarChart3 />}
-          label={t('nav.analytics')}
-        />
-        <SidebarItem
-          page="tools"
-          icon={<Wrench />}
-          label={t('nav.tools')}
         />
         <SidebarItem
           page="contacts"

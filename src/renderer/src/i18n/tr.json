@@ -7,8 +7,6 @@
     "dashboard": "Gösterge Paneli",
     "projects": "Projeler",
     "notes": "Notlar",
-    "analytics": "Analitik",
-    "tools": "Araçlar",
     "contacts": "Kişiler",
     "security": "Güvenlik",
     "settings": "Ayarlar"
@@ -159,6 +157,7 @@
     "advanced": "Gelişmiş",
     "debug": "Hata Ayıklama",
     "about": "Hakkında",
+    "paths": "Yollar",
     "save": "Ayarları Kaydet",
     "saved": "Kaydedildi!",
     "language": "Dil",

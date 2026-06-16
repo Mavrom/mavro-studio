@@ -7,8 +7,6 @@
     "dashboard": "Dashboard",
     "projects": "Projects",
     "notes": "Notes",
-    "analytics": "Analytics",
-    "tools": "Tools",
     "contacts": "Contacts",
     "security": "Security",
     "settings": "Settings"
@@ -159,6 +157,7 @@
     "advanced": "Advanced",
     "debug": "Debugging",
     "about": "About",
+    "paths": "Paths",
     "save": "Save Settings",
     "saved": "Saved!",
     "language": "Language",
