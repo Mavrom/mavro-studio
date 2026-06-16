@@ -7,8 +7,9 @@ import {
   FileText,
   Users2,
   Settings,
-  ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ChevronsLeft,
+  ChevronDown
 } from 'lucide-react'
 
 interface SidebarItemProps {
@@ -79,7 +80,11 @@ export default function Sidebar() {
             <span className="sidebar-brand-name">{t('app.name')}</span>
             <span className="sidebar-brand-version">{t('app.version')} {appVersion}</span>
           </div>
+          <ChevronDown size={15} className="sidebar-brand-caret" />
         </div>
+        <button className="sidebar-collapse-btn" onClick={toggleSidebar} title="Daralt / Genişlet">
+          {sidebarCollapsed ? <ChevronRight size={16} /> : <ChevronsLeft size={16} />}
+        </button>
       </div>
 
       <nav className="sidebar-nav">
@@ -116,20 +121,14 @@ export default function Sidebar() {
         />
       </nav>
 
-      <button className="sidebar-toggle" onClick={toggleSidebar}>
-        {sidebarCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-      </button>
-
       <div className="sidebar-footer" ref={profileMenuRef} style={{ position: 'relative' }}>
         <div
-          className="sidebar-user"
+          className={`sidebar-item sidebar-admin ${showProfileMenu ? 'open' : ''}`}
           onClick={() => setShowProfileMenu(!showProfileMenu)}
+          title="Admin"
         >
-          <div className="sidebar-avatar">U</div>
-          <div className="sidebar-user-info">
-            <span className="sidebar-user-name">Mavro User</span>
-            <span className="sidebar-user-role">Developer</span>
-          </div>
+          <div className="sidebar-item-icon"><Settings /></div>
+          <span className="sidebar-item-text">Admin</span>
         </div>
 
         {/* Profile Popup Menu */}

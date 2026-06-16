@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { useAppStore } from '../store'
 import {
   Search, Plus, Star, Edit, Trash2, Eye, X, ChevronLeft, ChevronRight,
-  Folder, FolderOpen, File as FileIcon, ExternalLink, Link2, Hash, Calendar, Clock
+  Folder, FolderOpen, File as FileIcon, ExternalLink, Link2, Hash, Calendar, Clock,
+  LayoutGrid
 } from 'lucide-react'
 import BackButton from '../components/common/BackButton'
 
@@ -625,12 +626,15 @@ export default function Projects() {
   // ============ BOARD ============
   const renderBoard = () => (
     <>
-      <div className="page-header">
+      <div className="page-header page-header-hero">
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
           <BackButton />
+          <div className="page-header-icon">
+            <LayoutGrid size={22} />
+          </div>
           <div>
             <h1 className="page-title">{t('projects.title')}</h1>
-            <p className="page-subtitle">{t('projects.subtitle')}</p>
+            <p className="page-subtitle">{filteredProjects.length} {t('projects.title').toLowerCase()}</p>
           </div>
         </div>
         <button className="btn btn-primary" onClick={openAddModal}>
