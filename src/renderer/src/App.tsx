@@ -82,7 +82,7 @@ function App() {
         <main className="main-content">
           {!showSidebar && (
             <div style={{ padding: 'var(--space-4) var(--space-8) 0', display: 'flex', alignItems: 'center' }}>
-              <BackButton onClick={() => setActivePage('dashboard')} />
+              <BackButton onClick={() => setActivePage('home')} />
             </div>
           )}
           {renderPage()}
