@@ -1,10 +1,11 @@
+import { useState, useRef, useEffect } from 'react'
 import { useAppStore } from '../../store'
 import {
+  Home,
   LayoutDashboard,
   FolderGit2,
   FileText,
   Users2,
-  ShieldCheck,
   Settings,
   ChevronLeft,
   ChevronRight
@@ -37,7 +38,22 @@ function SidebarItem({ page, icon, label, badge }: SidebarItemProps) {
 }
 
 export default function Sidebar() {
-  const { t, sidebarCollapsed, toggleSidebar } = useAppStore()
+  const { t, sidebarCollapsed, toggleSidebar, setActivePage } = useAppStore()
+  const [showProfileMenu, setShowProfileMenu] = useState(false)
+  const profileMenuRef = useRef<HTMLDivElement>(null)
+
+  // Close profile menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target as Node)) {
+        setShowProfileMenu(false)
+      }
+    }
+    if (showProfileMenu) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showProfileMenu])
 
   return (
     <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
@@ -52,6 +68,13 @@ export default function Sidebar() {
       </div>
 
       <nav className="sidebar-nav">
+        <div className="sidebar-section-title">{t('sections.home')}</div>
+        <SidebarItem
+          page="home"
+          icon={<Home />}
+          label={t('nav.home')}
+        />
+
         <div className="sidebar-section-title">{t('sections.main')}</div>
         <SidebarItem
           page="dashboard"
@@ -76,32 +99,39 @@ export default function Sidebar() {
           icon={<Users2 />}
           label={t('nav.contacts')}
         />
-
-        <div className="sidebar-section-title">{t('sections.system')}</div>
-        <SidebarItem
-          page="security"
-          icon={<ShieldCheck />}
-          label={t('nav.security')}
-        />
-        <SidebarItem
-          page="settings"
-          icon={<Settings />}
-          label={t('nav.settings')}
-        />
       </nav>
 
       <button className="sidebar-toggle" onClick={toggleSidebar}>
         {sidebarCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
       </button>
 
-      <div className="sidebar-footer">
-        <div className="sidebar-user">
+      <div className="sidebar-footer" ref={profileMenuRef} style={{ position: 'relative' }}>
+        <div
+          className="sidebar-user"
+          onClick={() => setShowProfileMenu(!showProfileMenu)}
+        >
           <div className="sidebar-avatar">U</div>
           <div className="sidebar-user-info">
             <span className="sidebar-user-name">Mavro User</span>
             <span className="sidebar-user-role">Developer</span>
           </div>
         </div>
+
+        {/* Profile Popup Menu */}
+        {showProfileMenu && (
+          <div className="profile-popup-menu animate-fade-in">
+            <div
+              className="profile-popup-item"
+              onClick={() => {
+                setActivePage('settings')
+                setShowProfileMenu(false)
+              }}
+            >
+              <Settings size={15} />
+              <span>{t('profile.settings')}</span>
+            </div>
+          </div>
+        )}
       </div>
     </aside>
   )

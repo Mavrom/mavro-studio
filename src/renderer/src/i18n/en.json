@@ -4,6 +4,7 @@
     "version": "Version"
   },
   "nav": {
+    "home": "Home",
     "dashboard": "Dashboard",
     "projects": "Projects",
     "notes": "Notes",
@@ -12,6 +13,7 @@
     "settings": "Settings"
   },
   "sections": {
+    "home": "HOME",
     "main": "MAIN MENU",
     "workspace": "WORKSPACE",
     "system": "SYSTEM"
@@ -119,6 +121,7 @@
     "title": "Contacts",
     "subtitle": "Contact and address book management",
     "newContact": "New Contact",
+    "editContact": "Edit Contact",
     "searchPlaceholder": "Search contacts...",
     "all": "All",
     "favorites": "Favorites",
@@ -126,10 +129,13 @@
     "noContacts": "No contacts added yet",
     "addFirst": "Click the button to add your first contact",
     "name": "Full Name",
-    "email": "Email",
+    "username": "Username",
+    "customId": "ID",
     "phone": "Phone",
-    "company": "Company",
-    "notes": "Notes"
+    "birthday": "Birthday",
+    "info": "Info",
+    "notes": "Notes",
+    "selectDate": "Select date"
   },
   "security": {
     "title": "Security",
@@ -252,6 +258,30 @@
     "online": "Online",
     "offline": "Offline",
     "ready": "Ready"
+  },
+  "home": {
+    "title": "Home",
+    "subtitle": "Calendar, alarms and notes",
+    "addAlarm": "Add Alarm",
+    "addNote": "Add Note",
+    "alarmTitle": "Alarm Title",
+    "alarmTime": "Time",
+    "noteText": "Note text",
+    "noEvents": "No events on this date",
+    "alarms": "Alarms",
+    "notes": "Notes",
+    "alarmTriggered": "Alarm time has arrived!",
+    "alarmAdded": "Alarm added",
+    "noteAdded": "Note added",
+    "alarmDeleted": "Alarm deleted",
+    "noteDeleted": "Note deleted",
+    "selectDateFirst": "Please select a date first",
+    "enterAlarmTitle": "Please enter alarm title",
+    "enterNoteText": "Please enter note text"
+  },
+  "profile": {
+    "settings": "Settings",
+    "logout": "Log Out"
   },
   "statusBar": {
     "ready": "Ready",

@@ -88,7 +88,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
 
   // Active page
-  activePage: 'dashboard',
+  activePage: 'home',
   setActivePage: (page) => set({ activePage: page }),
 
   // Notifications

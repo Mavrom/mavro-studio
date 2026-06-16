@@ -4,6 +4,7 @@
     "version": "Sürüm"
   },
   "nav": {
+    "home": "Ana Sayfa",
     "dashboard": "Gösterge Paneli",
     "projects": "Projeler",
     "notes": "Notlar",
@@ -12,6 +13,7 @@
     "settings": "Ayarlar"
   },
   "sections": {
+    "home": "ANA SAYFA",
     "main": "ANA MENÜ",
     "workspace": "ÇALIŞMA ALANI",
     "system": "SİSTEM"
@@ -119,17 +121,21 @@
     "title": "Kişiler",
     "subtitle": "Kişi ve adres defteri yönetimi",
     "newContact": "Yeni Kişi",
+    "editContact": "Kişiyi Düzenle",
     "searchPlaceholder": "Kişi ara...",
     "all": "Tümü",
     "favorites": "Favoriler",
     "groups": "Gruplar",
     "noContacts": "Henüz kişi eklenmedi",
     "addFirst": "İlk kişinizi eklemek için butonu kullanın",
-    "name": "Ad Soyad",
-    "email": "E-posta",
+    "name": "Adı Soyadı",
+    "username": "Kullanıcı Adı",
+    "customId": "ID",
     "phone": "Telefon",
-    "company": "Şirket",
-    "notes": "Notlar"
+    "birthday": "Doğum Günü",
+    "info": "Info",
+    "notes": "Notlar",
+    "selectDate": "Tarih seçin"
   },
   "security": {
     "title": "Güvenlik",
@@ -252,6 +258,30 @@
     "online": "Çevrimiçi",
     "offline": "Çevrimdışı",
     "ready": "Hazır"
+  },
+  "home": {
+    "title": "Ana Sayfa",
+    "subtitle": "Takvim, alarmlar ve notlar",
+    "addAlarm": "Alarm Ekle",
+    "addNote": "Not Ekle",
+    "alarmTitle": "Alarm Başlığı",
+    "alarmTime": "Saat",
+    "noteText": "Not metni",
+    "noEvents": "Bu tarihte etkinlik yok",
+    "alarms": "Alarmlar",
+    "notes": "Notlar",
+    "alarmTriggered": "Alarm zamanı geldi!",
+    "alarmAdded": "Alarm eklendi",
+    "noteAdded": "Not eklendi",
+    "alarmDeleted": "Alarm silindi",
+    "noteDeleted": "Not silindi",
+    "selectDateFirst": "Lütfen önce bir tarih seçin",
+    "enterAlarmTitle": "Lütfen alarm başlığını girin",
+    "enterNoteText": "Lütfen not metnini girin"
+  },
+  "profile": {
+    "settings": "Ayarlar",
+    "logout": "Çıkış Yap"
   },
   "statusBar": {
     "ready": "Hazır",

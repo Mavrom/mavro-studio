@@ -5,11 +5,11 @@ import Sidebar from './components/layout/Sidebar'
 import StatusBar from './components/layout/StatusBar'
 import ToastContainer from './components/common/ToastContainer'
 import UpdateModal from './components/common/UpdateModal'
+import HomePage from './pages/HomePage'
 import Dashboard from './pages/Dashboard'
 import Projects from './pages/Projects'
 import Notes from './pages/Notes'
 import Contacts from './pages/Contacts'
-import Security from './pages/Security'
 import Settings from './pages/Settings'
 
 function App() {
@@ -61,13 +61,13 @@ function App() {
 
   const renderPage = () => {
     switch (activePage) {
+      case 'home': return <HomePage />
       case 'dashboard': return <Dashboard />
       case 'projects': return <Projects />
       case 'notes': return <Notes />
       case 'contacts': return <Contacts />
-      case 'security': return <Security />
       case 'settings': return <Settings />
-      default: return <Dashboard />
+      default: return <HomePage />
     }
   }
 
