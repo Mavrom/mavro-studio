@@ -40,6 +40,7 @@ function SidebarItem({ page, icon, label, badge }: SidebarItemProps) {
 export default function Sidebar() {
   const { t, sidebarCollapsed, toggleSidebar, setActivePage } = useAppStore()
   const [showProfileMenu, setShowProfileMenu] = useState(false)
+  const [appVersion, setAppVersion] = useState('1.1.8')
   const profileMenuRef = useRef<HTMLDivElement>(null)
 
   // Close profile menu on outside click
@@ -55,6 +56,20 @@ export default function Sidebar() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [showProfileMenu])
 
+  useEffect(() => {
+    const loadVersion = async () => {
+      try {
+        if (window.api) {
+          const info = await window.api.getSystemInfo() as { appVersion: string }
+          if (info?.appVersion) setAppVersion(info.appVersion)
+        }
+      } catch {
+        // keep fallback
+      }
+    }
+    loadVersion()
+  }, [])
+
   return (
     <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
       <div className="sidebar-header">
@@ -62,7 +77,7 @@ export default function Sidebar() {
           <div className="sidebar-brand-icon">M</div>
           <div className="sidebar-brand-text">
             <span className="sidebar-brand-name">{t('app.name')}</span>
-            <span className="sidebar-brand-version">{t('app.version')} 1.0.0</span>
+            <span className="sidebar-brand-version">{t('app.version')} {appVersion}</span>
           </div>
         </div>
       </div>

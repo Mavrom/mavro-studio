@@ -45,8 +45,12 @@ Aylık takvim görünümü üzerinden istediğin güne not veya alarm ekle. Alar
 - Proje, kişi ve not sayılarına anlık erişim
 - Hızlı aksiyon kısayolları
 
-### 📁 Projeler
-Mavro projelerini kategori, favori ve arama filtreleriyle listele ve yönet. Her proje için başlık, açıklama, kategori ve son değişiklik tarihini takip et.
+### 📁 Projeler (Kanban Board)
+Orkun Işıtmak'ın prodüksiyon yönetim panelinden ilham alınarak tasarlanan tam fonksiyonel **Kanban Board** sistemi:
+- **Sürükle ve Bırak (Drag & Drop):** Proje kartlarını sütunlar (Taslak, Prodüksiyon, Post Prodüksiyon, Yayınlandı, İptal) arasında sürükleyerek durumlarını anında değiştirin.
+- **Kolay Gezinme:** Üst kısımdaki tıklanabilir durum badge'leri sayesinde ilgili Kanban sütununa yumuşak geçişle (scroll) odaklanın.
+- **Zengin Kart Detayları:** Emoji destekli başlıklar, oluşturan kişi bilgisi (renkli göstergeli), seri adı, platform etiketleri (YouTube, Reels, TikTok vb.), çekim ve yayın tarihleri ile izlenme/metrik sayıları.
+- **Hızlı Durum Menüsü:** Kart altındaki durum seçiciyle sürüklemeden de hızlıca durum güncelleyin. Favori ve hızlı silme işlemlerini doğrudan kart üzerinden yapın.
 
 ### 📝 Notlar
 Markdown destekli notlar oluştur. Arama ve kategori filtreleriyle notlarını anında bul.
