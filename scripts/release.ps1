@@ -40,11 +40,14 @@ if ($LASTEXITCODE -ne 0) { Write-Host "Yayinlama basarisiz!" -ForegroundColor Re
 # 6. latest.yml yukle (electron-builder bazen atliyor)
 gh release upload "v$newVersion" "dist\latest.yml" --repo Mavrom/mavro-studio --clobber 2>$null
 
-# 7. Draft duplicate'i sil (electron-builder ikili olusturuyor)
+# 7. Draft duplicate'i sil (electron-builder ikili olusturuyor, birini birak)
 Write-Host "`nDuplicate draft release temizleniyor..." -ForegroundColor Cyan
 $releases = gh api repos/Mavrom/mavro-studio/releases | ConvertFrom-Json
-foreach ($r in $releases) {
-    if ($r.tag_name -eq "v$newVersion" -and $r.draft -eq $true) {
+$myDrafts = $releases | Where-Object { $_.tag_name -eq "v$newVersion" -and $_.draft -eq $true }
+$kept = $false
+foreach ($r in $myDrafts) {
+    if (-not $kept) { $kept = $true; Write-Host "Draft korundu: $($r.id)" }
+    else {
         gh api "repos/Mavrom/mavro-studio/releases/$($r.id)" -X DELETE 2>$null
         Write-Host "Draft silindi: $($r.id)"
     }
