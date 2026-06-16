@@ -8,7 +8,8 @@ import {
   Cpu,
   Activity,
   ArrowRight,
-  Plus
+  Plus,
+  TrendingUp
 } from 'lucide-react'
 
 interface SystemStats {
@@ -80,7 +81,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade-in-up">
       <div className="page-header">
         <div>
           <h1 className="page-title">{t('dashboard.title')}</h1>
@@ -96,8 +97,8 @@ export default function Dashboard() {
       </div>
 
       <div className="page-content flex flex-col gap-6">
-        {/* Welcome card */}
-        <div className="card flex items-center justify-between" style={{ background: 'linear-gradient(135deg, rgba(79, 143, 255, 0.1), rgba(167, 139, 250, 0.1))' }}>
+        {/* Welcome hero card */}
+        <div className="card card-glow flex items-center justify-between animate-fade-in-up stagger-1">
           <div>
             <h2 className="card-title" style={{ fontSize: 'var(--font-lg)', marginBottom: '4px' }}>
               {t('dashboard.welcome')}, Mavro Developer!
@@ -117,17 +118,21 @@ export default function Dashboard() {
 
         {/* Stats Grid */}
         <div className="card-grid">
-          <div className="stat-card" onClick={() => setActivePage('projects')}>
+          <div className="stat-card animate-fade-in-up stagger-1" onClick={() => setActivePage('projects')}>
             <div className="stat-icon blue">
               <FolderGit2 size={22} />
             </div>
             <div className="stat-info">
               <span className="stat-value">3</span>
               <span className="stat-label">{t('dashboard.totalProjects')}</span>
+              <span className="stat-change up">
+                <TrendingUp size={10} />
+                Active
+              </span>
             </div>
           </div>
 
-          <div className="stat-card" onClick={() => setActivePage('contacts')}>
+          <div className="stat-card animate-fade-in-up stagger-2" onClick={() => setActivePage('contacts')}>
             <div className="stat-icon green">
               <Users2 size={22} />
             </div>
@@ -137,7 +142,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="stat-card" onClick={() => setActivePage('notes')}>
+          <div className="stat-card animate-fade-in-up stagger-3" onClick={() => setActivePage('notes')}>
             <div className="stat-icon purple">
               <FileText size={22} />
             </div>
@@ -147,8 +152,8 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="stat-card">
-            <div className="stat-icon orange">
+          <div className="stat-card animate-fade-in-up stagger-4">
+            <div className="stat-icon cyan">
               <Clock size={22} />
             </div>
             <div className="stat-info">
@@ -163,13 +168,15 @@ export default function Dashboard() {
         {/* Core Layout section: System resources & activities */}
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 'var(--space-6)' }}>
           {/* System Monitor */}
-          <div className="card flex flex-col gap-4">
-            <h3 className="card-title flex items-center gap-2">
-              <Cpu size={18} style={{ color: 'var(--accent-primary)' }} />
-              {t('dashboard.systemStatus')}
-            </h3>
+          <div className="card flex flex-col gap-4 animate-fade-in-up stagger-5">
+            <div className="card-header">
+              <h3 className="card-title flex items-center gap-2">
+                <Cpu size={18} style={{ color: 'var(--accent-primary)' }} />
+                {t('dashboard.systemStatus')}
+              </h3>
+            </div>
 
-            <div className="flex flex-col gap-4 mt-2">
+            <div className="flex flex-col gap-4">
               <div>
                 <div className="flex justify-between mb-2">
                   <span className="text-sm">{t('dashboard.cpu')}</span>
@@ -203,11 +210,13 @@ export default function Dashboard() {
           </div>
 
           {/* Quick Actions */}
-          <div className="card flex flex-col gap-4">
-            <h3 className="card-title flex items-center gap-2">
-              <Activity size={18} style={{ color: 'var(--accent-purple)' }} />
-              {t('dashboard.quickActions')}
-            </h3>
+          <div className="card flex flex-col gap-4 animate-fade-in-up stagger-6">
+            <div className="card-header">
+              <h3 className="card-title flex items-center gap-2">
+                <Activity size={18} style={{ color: 'var(--accent-purple)' }} />
+                {t('dashboard.quickActions')}
+              </h3>
+            </div>
             <div className="flex flex-col gap-2">
               <button className="btn btn-secondary text-left w-full justify-between" onClick={() => setActivePage('notes')}>
                 <span>{t('dashboard.newNote')}</span>

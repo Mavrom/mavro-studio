@@ -11,10 +11,12 @@ import Notes from './pages/Notes'
 import Contacts from './pages/Contacts'
 import Security from './pages/Security'
 import Settings from './pages/Settings'
+import Setup from './pages/Setup'
 
 function App() {
   const { activePage, setTheme, setLanguage } = useAppStore()
 
+  const [needsSetup, setNeedsSetup] = useState<boolean | null>(null)
   const [updateInfo, setUpdateInfo] = useState<{ version: string } | null>(null)
   const [updateDownloading, setUpdateDownloading] = useState(false)
   const [updateProgress, setUpdateProgress] = useState<number | null>(null)
@@ -26,13 +28,17 @@ function App() {
         if (window.api) {
           const theme = await window.api.getTheme() as string
           const lang = await window.api.getSetting('language') as string
+          const setupComplete = await window.api.getSetting('setupComplete')
           if (theme) setTheme(theme as 'dark' | 'light' | 'system')
           if (lang) setLanguage(lang)
+          setNeedsSetup(!setupComplete)
         } else {
           document.documentElement.setAttribute('data-theme', 'dark')
+          setNeedsSetup(false)
         }
       } catch {
         document.documentElement.setAttribute('data-theme', 'dark')
+        setNeedsSetup(false)
       }
     }
     loadSettings()
@@ -69,6 +75,20 @@ function App() {
       case 'settings': return <Settings />
       default: return <Dashboard />
     }
+  }
+
+  if (needsSetup === null) {
+    return <TitleBar />
+  }
+
+  if (needsSetup) {
+    return (
+      <>
+        <TitleBar />
+        <Setup onComplete={() => setNeedsSetup(false)} />
+        <ToastContainer />
+      </>
+    )
   }
 
   return (

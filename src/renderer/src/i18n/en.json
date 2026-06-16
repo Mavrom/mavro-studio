@@ -226,6 +226,60 @@
     "deleteAccount": "Delete Account",
     "exportData": "Export Data"
   },
+  "setup": {
+    "brandTag": "Setup Wizard",
+    "asideFooter": "You can change these settings later in Settings.",
+    "skip": "Skip",
+    "launch": "Launch Mavro Studio",
+    "getStarted": "Get Started",
+    "steps": {
+      "welcome": "Welcome",
+      "welcomeSub": "Step into Mavro Studio",
+      "preferences": "Preferences",
+      "preferencesSub": "Language and theme",
+      "profile": "Profile",
+      "profileSub": "Your personal details",
+      "paths": "File Paths",
+      "pathsSub": "Data and export locations",
+      "ready": "Ready",
+      "readySub": "All set"
+    },
+    "welcome": {
+      "eyebrow": "WELCOME",
+      "title": "Welcome to Mavro Studio",
+      "subtitle": "Complete a quick setup in just a few steps and dive into your premium experience.",
+      "feature1": "All-in-One Workspace",
+      "feature1Desc": "Projects, notes, contacts, and tools — all unified in one elegant interface.",
+      "feature2": "Fast & Lightweight",
+      "feature2Desc": "Mavro Studio runs locally, launches instantly, and uses your resources efficiently.",
+      "feature3": "Private & Secure",
+      "feature3Desc": "All your data lives only on your device — nothing is ever sent to the cloud."
+    },
+    "preferences": {
+      "eyebrow": "PERSONALIZATION",
+      "title": "Set Your Preferences",
+      "subtitle": "Choose your language and appearance. You can update these at any time from Settings.",
+      "themeHint": "The \"System\" theme automatically follows your operating system's light or dark appearance setting."
+    },
+    "profile": {
+      "eyebrow": "PROFILE",
+      "title": "Tell Us About Yourself",
+      "subtitle": "Your optional name and email help personalize Mavro Studio just for you.",
+      "namePlaceholder": "Your name",
+      "emailPlaceholder": "you@example.com"
+    },
+    "paths": {
+      "eyebrow": "FILE PATHS",
+      "title": "Choose Where Your Data Lives",
+      "subtitle": "Exported files and application data are stored here. You can change this later under Settings › Paths.",
+      "dataDirDefault": "Default location"
+    },
+    "ready": {
+      "eyebrow": "ALL DONE",
+      "title": "You're All Set!",
+      "subtitle": "Setup is complete. Launch Mavro Studio and start enjoying your premium workspace."
+    }
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",

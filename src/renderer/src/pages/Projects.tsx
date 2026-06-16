@@ -144,14 +144,18 @@ export default function Projects() {
           </div>
         ) : (
           <div className="card-grid">
-            {filteredProjects.map((p) => (
-              <div key={p.id} className="card flex flex-col justify-between" style={{ minHeight: '180px' }}>
+            {filteredProjects.map((p, i) => (
+              <div
+                key={p.id}
+                className={`card card-interactive flex flex-col justify-between stagger-${Math.min(i + 1, 6) as 1 | 2 | 3 | 4 | 5 | 6}`}
+                style={{ minHeight: '180px' }}
+              >
                 <div>
                   <div className="flex justify-between items-center mb-2">
                     <span className="badge badge-primary">{p.category}</span>
                     <button
                       className="btn btn-ghost btn-sm btn-icon"
-                      onClick={() => toggleFavorite(p.id)}
+                      onClick={(e) => { e.stopPropagation(); toggleFavorite(p.id) }}
                       style={{ color: p.favorite ? 'var(--accent-warning)' : 'var(--text-muted)' }}
                     >
                       <Star size={16} fill={p.favorite ? 'currentColor' : 'none'} />
@@ -169,14 +173,14 @@ export default function Projects() {
                   <div className="flex gap-2">
                     <button
                       className="btn btn-secondary btn-sm btn-icon"
-                      onClick={() => addToast({ message: 'Proje açılıyor...', type: 'info' })}
+                      onClick={(e) => { e.stopPropagation(); addToast({ message: 'Proje açılıyor...', type: 'info' }) }}
                       title={t('projects.open')}
                     >
                       <ExternalLink size={14} />
                     </button>
                     <button
                       className="btn btn-danger btn-sm btn-icon"
-                      onClick={() => deleteProject(p.id)}
+                      onClick={(e) => { e.stopPropagation(); deleteProject(p.id) }}
                       title={t('projects.delete')}
                     >
                       <Trash2 size={14} />

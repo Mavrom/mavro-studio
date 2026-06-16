@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useAppStore } from '../../store'
 import {
   LayoutDashboard,
@@ -38,6 +39,13 @@ function SidebarItem({ page, icon, label, badge }: SidebarItemProps) {
 
 export default function Sidebar() {
   const { t, sidebarCollapsed, toggleSidebar } = useAppStore()
+  const [appVersion, setAppVersion] = useState('1.0.2')
+
+  useEffect(() => {
+    window.api?.getSystemInfo().then((info) => {
+      if (info?.appVersion) setAppVersion(info.appVersion)
+    }).catch(() => {})
+  }, [])
 
   return (
     <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
@@ -46,7 +54,7 @@ export default function Sidebar() {
           <div className="sidebar-brand-icon">M</div>
           <div className="sidebar-brand-text">
             <span className="sidebar-brand-name">{t('app.name')}</span>
-            <span className="sidebar-brand-version">{t('app.version')} 1.0.0</span>
+            <span className="sidebar-brand-version">{t('app.version')} v{appVersion}</span>
           </div>
         </div>
       </div>

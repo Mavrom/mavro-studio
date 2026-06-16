@@ -133,7 +133,7 @@ export default function Notes() {
         }}
       >
         {/* Left Side: Note List */}
-        <div className="card flex flex-col gap-4" style={{ height: '100%', overflow: 'hidden' }}>
+        <div className="card flex flex-col gap-3" style={{ height: '100%', overflow: 'hidden' }}>
           <button className="btn btn-primary w-full" onClick={createNote}>
             <Plus size={16} />
             {t('notes.newNote')}
@@ -151,36 +151,45 @@ export default function Notes() {
           </div>
 
           <div className="flex flex-col gap-1" style={{ flex: 1, overflowY: 'auto' }}>
-            {filteredNotes.map((n) => (
-              <div
-                key={n.id}
-                className={`sidebar-item ${n.id === activeNoteId ? 'active' : ''}`}
-                style={{ padding: 'var(--space-2) var(--space-3)', margin: 0 }}
-                onClick={() => setActiveNoteId(n.id)}
-              >
-                <FileText size={16} style={{ flexShrink: 0 }} />
-                <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
-                  {n.title || t('notes.untitled')}
-                </div>
-                <button
-                  className="btn btn-ghost btn-sm btn-icon"
-                  style={{ width: 22, height: 22, padding: 0 }}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleDelete(n.id)
-                  }}
-                >
-                  <Trash2 size={12} />
-                </button>
+            {filteredNotes.length === 0 ? (
+              <div className="empty-state" style={{ padding: 'var(--space-8) var(--space-4)' }}>
+                <FileText className="empty-state-icon" style={{ width: 36, height: 36 }} />
+                <p className="empty-state-text" style={{ fontSize: 'var(--font-sm)' }}>
+                  {t('notes.noNotes')}
+                </p>
               </div>
-            ))}
+            ) : (
+              filteredNotes.map((n) => (
+                <div
+                  key={n.id}
+                  className={`sidebar-item ${n.id === activeNoteId ? 'active' : ''}`}
+                  style={{ padding: 'var(--space-2) var(--space-3)', margin: 0 }}
+                  onClick={() => setActiveNoteId(n.id)}
+                >
+                  <FileText size={16} style={{ flexShrink: 0 }} />
+                  <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                    {n.title || t('notes.untitled')}
+                  </div>
+                  <button
+                    className="btn btn-ghost btn-sm btn-icon"
+                    style={{ width: 22, height: 22, padding: 0 }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDelete(n.id)
+                    }}
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
         {/* Right Side: Editor */}
         {activeNote ? (
           <div className="card flex flex-col gap-4" style={{ height: '100%' }}>
-            <div className="flex justify-between items-center pb-2" style={{ borderBottom: '1px solid var(--border-primary)' }}>
+            <div className="flex justify-between items-center pb-3" style={{ borderBottom: '1px solid var(--border-primary)' }}>
               <input
                 type="text"
                 className="input"
@@ -219,10 +228,10 @@ export default function Notes() {
           </div>
         ) : (
           <div className="card flex items-center justify-center text-center">
-            <div>
-              <FileText size={48} className="text-muted mb-4" />
-              <h3 className="card-title">{t('notes.noNotes')}</h3>
-              <p className="card-description">{t('notes.createFirst')}</p>
+            <div className="empty-state">
+              <FileText className="empty-state-icon" />
+              <h3 className="empty-state-title">{t('notes.noNotes')}</h3>
+              <p className="empty-state-text">{t('notes.createFirst')}</p>
             </div>
           </div>
         )}

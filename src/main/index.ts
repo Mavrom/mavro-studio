@@ -10,6 +10,7 @@ const store = new Store({
   defaults: {
     language: 'tr',
     theme: 'dark',
+    setupComplete: false,
     autoStart: false,
     defaultExportPath: '',
     dataDirectory: join(app.getPath('userData'), 'data'),

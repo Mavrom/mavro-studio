@@ -226,6 +226,60 @@
     "deleteAccount": "Hesabı Sil",
     "exportData": "Verileri Dışa Aktar"
   },
+  "setup": {
+    "brandTag": "Kurulum Sihirbazı",
+    "asideFooter": "Bu adımları daha sonra Ayarlar'dan değiştirebilirsiniz.",
+    "skip": "Atla",
+    "launch": "Mavro Studio'yu Başlat",
+    "getStarted": "Başlayalım",
+    "steps": {
+      "welcome": "Hoş Geldiniz",
+      "welcomeSub": "Mavro Studio'ya adım atın",
+      "preferences": "Tercihler",
+      "preferencesSub": "Dil ve tema ayarları",
+      "profile": "Profil",
+      "profileSub": "Kişisel bilgileriniz",
+      "paths": "Dosya Yolları",
+      "pathsSub": "Veri ve dışa aktarma konumları",
+      "ready": "Hazır",
+      "readySub": "Her şey ayarlandı"
+    },
+    "welcome": {
+      "eyebrow": "HOŞ GELDİNİZ",
+      "title": "Mavro Studio'ya hoş geldiniz",
+      "subtitle": "Birkaç hızlı adımda kurulumunuzu tamamlayın ve premium deneyiminize başlayın.",
+      "feature1": "Hepsi Bir Arada Çalışma Alanı",
+      "feature1Desc": "Projeler, notlar, kişiler ve araçlar tek bir şık arayüzde bir araya geliyor.",
+      "feature2": "Hızlı ve Hafif",
+      "feature2Desc": "Yerel olarak çalışan Mavro Studio, anında başlar ve kaynakları verimli kullanır.",
+      "feature3": "Gizli ve Güvenli",
+      "feature3Desc": "Tüm verileriniz yalnızca cihazınızda saklanır; hiçbir şey buluta gönderilmez."
+    },
+    "preferences": {
+      "eyebrow": "KİŞİSELLEŞTİRME",
+      "title": "Tercihlerinizi Ayarlayın",
+      "subtitle": "Dil ve görünüm seçimlerinizi yapın; bunları istediğiniz zaman Ayarlar'dan güncelleyebilirsiniz.",
+      "themeHint": "\"Sistem\" teması, işletim sisteminizin açık/koyu görünüm tercihini otomatik olarak takip eder."
+    },
+    "profile": {
+      "eyebrow": "PROFİL",
+      "title": "Kendinizi Tanıtın",
+      "subtitle": "İsteğe bağlı ad ve e-posta bilgileriniz Mavro Studio'yu sizin için kişiselleştirir.",
+      "namePlaceholder": "Adınız",
+      "emailPlaceholder": "ornek@eposta.com"
+    },
+    "paths": {
+      "eyebrow": "DOSYA YOLLARI",
+      "title": "Verilerinizin Konumunu Seçin",
+      "subtitle": "Dışa aktarılan dosyalar ve uygulama verileri burada saklanır. Bu konumu daha sonra Ayarlar > Yollar bölümünden değiştirebilirsiniz.",
+      "dataDirDefault": "Varsayılan konum"
+    },
+    "ready": {
+      "eyebrow": "TAMAMLANDI",
+      "title": "Her Şey Hazır!",
+      "subtitle": "Kurulum tamamlandı. Mavro Studio'yu başlatarak premium deneyiminizin keyfini çıkarmaya başlayın."
+    }
+  },
   "common": {
     "save": "Kaydet",
     "cancel": "İptal",

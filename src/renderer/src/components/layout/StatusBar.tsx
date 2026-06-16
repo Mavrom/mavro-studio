@@ -5,6 +5,7 @@ import { Wifi, WifiOff, RefreshCw } from 'lucide-react'
 export default function StatusBar() {
   const { t, language } = useAppStore()
   const [isOnline, setIsOnline] = useState(navigator.onLine)
+  const [appVersion, setAppVersion] = useState('1.0.2')
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true)
@@ -12,6 +13,10 @@ export default function StatusBar() {
 
     window.addEventListener('online', handleOnline)
     window.addEventListener('offline', handleOffline)
+
+    window.api?.getSystemInfo().then((info) => {
+      if (info?.appVersion) setAppVersion(info.appVersion)
+    }).catch(() => {})
 
     return () => {
       window.removeEventListener('online', handleOnline)
@@ -34,7 +39,7 @@ export default function StatusBar() {
         <span className="text-muted">|</span>
         <span className="flex items-center gap-1">
           <RefreshCw size={12} className="animate-spin stagger-3" style={{ animationDuration: '4s' }} />
-          <span>v1.0.0</span>
+          <span>v{appVersion}</span>
         </span>
       </div>
     </footer>

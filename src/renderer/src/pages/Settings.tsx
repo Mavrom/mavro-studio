@@ -27,14 +27,7 @@ const NAV: { id: Section; icon: React.ReactNode; labelKey: string }[] = [
 function SCard({ title, color, children }: { title: string; color: string; children: React.ReactNode }) {
   return (
     <div className="card" style={{ borderLeft: `3px solid ${color}`, paddingLeft: 'calc(var(--space-6) - 3px)' }}>
-      <div style={{
-        fontSize: 'var(--font-xs)',
-        fontWeight: 700,
-        textTransform: 'uppercase',
-        letterSpacing: '0.1em',
-        color,
-        marginBottom: 'var(--space-4)',
-      }}>{title}</div>
+      <div className="settings-card-label" style={{ color }}>{title}</div>
       {children}
     </div>
   )
@@ -55,6 +48,8 @@ export default function Settings() {
   const [proxyType, setProxyType] = useState('http')
   const [proxyHost, setProxyHost] = useState('')
   const [proxyPort, setProxyPort] = useState('')
+  const [profileName, setProfileName] = useState('')
+  const [profileEmail, setProfileEmail] = useState('')
   const [sysInfo, setSysInfo] = useState<Record<string, string> | null>(null)
 
   useEffect(() => {
@@ -68,7 +63,9 @@ export default function Settings() {
       window.api.getSetting('startupParams'),
       window.api.getSetting('proxy'),
       window.api.getSystemInfo(),
-    ]).then(([exportPath, dataDir, start, mPath, iPath, sParams, proxy, info]) => {
+      window.api.getSetting('profileName'),
+      window.api.getSetting('profileEmail'),
+    ]).then(([exportPath, dataDir, start, mPath, iPath, sParams, proxy, info, pName, pEmail]) => {
       if (exportPath) setDefaultExportPath(exportPath as string)
       if (dataDir) setDataDirectory(dataDir as string)
       setAutoStart(!!start)
@@ -82,7 +79,9 @@ export default function Settings() {
         if (p.host) setProxyHost(p.host as string)
         if (p.port) setProxyPort(p.port as string)
       }
-      setSysInfo(info as Record<string, string>)
+      setSysInfo(info as unknown as Record<string, string>)
+      if (pName) setProfileName(pName as string)
+      if (pEmail) setProfileEmail(pEmail as string)
     }).catch(console.error)
   }, [])
 
@@ -96,6 +95,8 @@ export default function Settings() {
         window.api.setSetting('idePath', idePath),
         window.api.setSetting('startupParams', startupParams),
         window.api.setSetting('proxy', { enabled: proxyEnabled, type: proxyType, host: proxyHost, port: proxyPort }),
+        window.api.setSetting('profileName', profileName),
+        window.api.setSetting('profileEmail', profileEmail),
       ])
     }
     addToast({ message: t('settings.saved'), type: 'success' })
@@ -141,6 +142,11 @@ export default function Settings() {
     { value: 'system' as const, label: t('settings.themeSystem') },
   ]
 
+  const languageOptions = [
+    { value: 'tr', label: 'Türkçe' },
+    { value: 'en', label: 'English' },
+  ]
+
   return (
     <div className="animate-fade-in" style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
 
@@ -157,38 +163,19 @@ export default function Settings() {
       <div style={{ display: 'grid', gridTemplateColumns: '210px 1fr', gap: 'var(--space-5)', flex: 1, overflow: 'hidden', minHeight: 0 }}>
 
         {/* Left nav */}
-        <div className="card" style={{ padding: 'var(--space-2)', display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {NAV.map(item => {
-            const active = section === item.id
-            return (
+        <div className="card" style={{ padding: 0 }}>
+          <nav className="settings-nav">
+            {NAV.map(item => (
               <button
                 key={item.id}
+                className={`settings-nav-item${section === item.id ? ' active' : ''}`}
                 onClick={() => setSection(item.id)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  padding: '10px 14px',
-                  borderRadius: 'var(--radius-md)',
-                  border: 'none',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  fontSize: 'var(--font-base)',
-                  fontWeight: active ? 600 : 400,
-                  color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  background: active ? 'var(--bg-active)' : 'transparent',
-                  borderLeft: active ? '2px solid var(--accent-primary)' : '2px solid transparent',
-                  width: '100%',
-                  transition: 'all 0.12s',
-                }}
               >
-                <span style={{ color: active ? 'var(--accent-primary)' : 'var(--text-muted)', display: 'flex' }}>
-                  {item.icon}
-                </span>
+                <span className="settings-nav-icon">{item.icon}</span>
                 {t(item.labelKey)}
               </button>
-            )
-          })}
+            ))}
+          </nav>
         </div>
 
         {/* Right content */}
@@ -198,29 +185,26 @@ export default function Settings() {
           {section === 'general' && (
             <>
               <SCard title={t('settings.language')} color="var(--accent-primary)">
-                <select className="select" value={language} onChange={e => setLanguage(e.target.value)}>
-                  <option value="tr">Türkçe (TR)</option>
-                  <option value="en">English (EN)</option>
-                </select>
+                <div className="segmented full">
+                  {languageOptions.map(opt => (
+                    <button
+                      key={opt.value}
+                      className={`segmented-item${language === opt.value ? ' active accent' : ''}`}
+                      onClick={() => setLanguage(opt.value)}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
               </SCard>
 
               <SCard title={t('settings.theme')} color="var(--accent-purple)">
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+                <div className="segmented full">
                   {themeOptions.map(opt => (
                     <button
                       key={opt.value}
+                      className={`segmented-item${theme === opt.value ? ' active' : ''}`}
                       onClick={() => setTheme(opt.value)}
-                      style={{
-                        padding: '10px',
-                        borderRadius: 'var(--radius-md)',
-                        border: theme === opt.value ? '1.5px solid var(--accent-purple)' : '1px solid var(--border-primary)',
-                        background: theme === opt.value ? 'var(--accent-purple-glow)' : 'var(--bg-secondary)',
-                        color: theme === opt.value ? 'var(--accent-purple)' : 'var(--text-secondary)',
-                        cursor: 'pointer',
-                        fontSize: 'var(--font-sm)',
-                        fontWeight: theme === opt.value ? 600 : 400,
-                        transition: 'all 0.12s',
-                      }}
                     >
                       {opt.label}
                     </button>
@@ -229,10 +213,10 @@ export default function Settings() {
               </SCard>
 
               <SCard title={t('settings.autoStart')} color="var(--accent-success)">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div style={{ fontSize: 'var(--font-base)', color: 'var(--text-primary)' }}>{t('settings.autoStart')}</div>
-                    <div className="form-hint" style={{ marginTop: 2 }}>{t('settings.autoStartDesc')}</div>
+                <div className="setting-row">
+                  <div className="setting-row-info">
+                    <span className="setting-row-label">{t('settings.autoStart')}</span>
+                    <span className="form-hint">{t('settings.autoStartDesc')}</span>
                   </div>
                   <label className="toggle">
                     <input type="checkbox" className="toggle-input" checked={autoStart} onChange={e => setAutoStart(e.target.checked)} />
@@ -305,15 +289,17 @@ export default function Settings() {
           {/* ── NETWORK ── */}
           {section === 'network' && (
             <SCard title={t('settings.proxy')} color="var(--accent-primary)">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 'var(--space-4)', borderBottom: '1px solid var(--border-primary)', marginBottom: 'var(--space-4)' }}>
-                <div style={{ fontSize: 'var(--font-base)', color: 'var(--text-primary)' }}>{t('settings.proxyEnabled')}</div>
+              <div className="setting-row">
+                <div className="setting-row-info">
+                  <span className="setting-row-label">{t('settings.proxyEnabled')}</span>
+                </div>
                 <label className="toggle">
                   <input type="checkbox" className="toggle-input" checked={proxyEnabled} onChange={e => setProxyEnabled(e.target.checked)} />
                   <span className="toggle-slider" />
                 </label>
               </div>
               {proxyEnabled && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }} className="animate-fade-in">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', paddingTop: 'var(--space-4)' }} className="animate-fade-in">
                   <div className="form-group">
                     <label className="form-label">{t('settings.proxyType')}</label>
                     <select className="select" value={proxyType} onChange={e => setProxyType(e.target.value)}>
@@ -343,11 +329,21 @@ export default function Settings() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
                 <div className="form-group">
                   <label className="form-label">{t('settings.profileName')}</label>
-                  <input type="text" className="input" placeholder={t('settings.profileName')} />
+                  <input
+                    type="text" className="input"
+                    placeholder={t('settings.profileName')}
+                    value={profileName}
+                    onChange={e => setProfileName(e.target.value)}
+                  />
                 </div>
                 <div className="form-group">
                   <label className="form-label">{t('settings.profileEmail')}</label>
-                  <input type="email" className="input" placeholder={t('settings.profileEmail')} />
+                  <input
+                    type="email" className="input"
+                    placeholder={t('settings.profileEmail')}
+                    value={profileEmail}
+                    onChange={e => setProfileEmail(e.target.value)}
+                  />
                 </div>
                 <div style={{ display: 'flex', gap: 10, paddingTop: 'var(--space-2)' }}>
                   <button className="btn btn-secondary">{t('settings.changePassword')}</button>
@@ -361,35 +357,33 @@ export default function Settings() {
           {section === 'debug' && (
             <>
               <SCard title={t('settings.debug')} color="var(--accent-warning)">
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-                  <div className="form-group">
-                    <label className="form-label">{t('settings.logLevel')}</label>
-                    <select className="select">
-                      <option value="debug">DEBUG</option>
-                      <option value="info">INFO</option>
-                      <option value="warn">WARN</option>
-                      <option value="error">ERROR</option>
-                    </select>
-                    <div className="form-hint">{t('settings.logLevelDesc')}</div>
+                <div className="form-group" style={{ marginBottom: 'var(--space-4)' }}>
+                  <label className="form-label">{t('settings.logLevel')}</label>
+                  <select className="select">
+                    <option value="debug">DEBUG</option>
+                    <option value="info">INFO</option>
+                    <option value="warn">WARN</option>
+                    <option value="error">ERROR</option>
+                  </select>
+                  <div className="form-hint">{t('settings.logLevelDesc')}</div>
+                </div>
+                <div className="setting-row">
+                  <div className="setting-row-info">
+                    <span className="setting-row-label">{t('settings.errorReporting')}</span>
+                    <span className="form-hint">{t('settings.errorReportingDesc')}</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--border-primary)' }}>
-                    <div>
-                      <div style={{ fontSize: 'var(--font-base)', color: 'var(--text-primary)' }}>{t('settings.errorReporting')}</div>
-                      <div className="form-hint" style={{ marginTop: 2 }}>{t('settings.errorReportingDesc')}</div>
-                    </div>
-                    <label className="toggle">
-                      <input type="checkbox" className="toggle-input" defaultChecked />
-                      <span className="toggle-slider" />
-                    </label>
-                  </div>
+                  <label className="toggle">
+                    <input type="checkbox" className="toggle-input" defaultChecked />
+                    <span className="toggle-slider" />
+                  </label>
                 </div>
               </SCard>
 
               <SCard title={t('settings.logMaintenance')} color="var(--accent-danger)">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div style={{ fontSize: 'var(--font-base)', color: 'var(--text-primary)' }}>{t('settings.logMaintenance')}</div>
-                    <div className="form-hint" style={{ marginTop: 2 }}>{t('settings.logMaintenanceDesc')}</div>
+                <div className="setting-row">
+                  <div className="setting-row-info">
+                    <span className="setting-row-label">{t('settings.logMaintenance')}</span>
+                    <span className="form-hint">{t('settings.logMaintenanceDesc')}</span>
                   </div>
                   <button className="btn btn-secondary btn-sm" onClick={clearLogs}>
                     <Trash2 size={13} />

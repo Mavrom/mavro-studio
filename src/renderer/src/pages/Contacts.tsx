@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAppStore } from '../store'
-import { Search, Plus, Trash2, Mail, Phone, Briefcase } from 'lucide-react'
+import { Search, Plus, Trash2, Mail, Phone, Briefcase, Users2 } from 'lucide-react'
 
 interface Contact {
   id: string
@@ -108,7 +108,9 @@ export default function Contacts() {
         {/* Dynamic Add Form */}
         {showForm && (
           <form className="card flex flex-col gap-4 animate-fade-in-up" onSubmit={handleAdd}>
-            <h3 className="card-title">{t('contacts.newContact')}</h3>
+            <div className="card-header">
+              <h3 className="card-title">{t('contacts.newContact')}</h3>
+            </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
               <div className="form-group">
                 <label className="form-label">{t('contacts.name')} *</label>
@@ -164,11 +166,12 @@ export default function Contacts() {
           </form>
         )}
 
-        {/* Contacts Table / Grid */}
+        {/* Contacts Table / Empty State */}
         {filteredContacts.length === 0 ? (
-          <div className="card text-center py-8">
-            <h3 className="card-title">{t('contacts.noContacts')}</h3>
-            <p className="card-description">{t('contacts.addFirst')}</p>
+          <div className="empty-state">
+            <Users2 className="empty-state-icon" />
+            <h3 className="empty-state-title">{t('contacts.noContacts')}</h3>
+            <p className="empty-state-text">{t('contacts.addFirst')}</p>
           </div>
         ) : (
           <div className="table-wrapper">
