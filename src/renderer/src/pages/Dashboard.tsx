@@ -76,7 +76,7 @@ export default function Dashboard() {
 
   const handleAction = (msg: string, page?: string) => {
     addToast({ message: msg, type: 'info' })
-    if (page) setActivePage(page, { fromDashboard: true })
+    if (page) setActivePage(page)
   }
 
   return (
@@ -117,7 +117,7 @@ export default function Dashboard() {
 
         {/* Stats Grid */}
         <div className="card-grid">
-          <div className="stat-card" onClick={() => setActivePage('projects', { fromDashboard: true })}>
+          <div className="stat-card" onClick={() => setActivePage('projects')}>
             <div className="stat-icon blue">
               <FolderGit2 size={22} />
             </div>
@@ -127,7 +127,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="stat-card" onClick={() => setActivePage('contacts', { fromDashboard: true })}>
+          <div className="stat-card" onClick={() => setActivePage('contacts')}>
             <div className="stat-icon green">
               <Users2 size={22} />
             </div>
@@ -137,7 +137,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="stat-card" onClick={() => setActivePage('notes', { fromDashboard: true })}>
+          <div className="stat-card" onClick={() => setActivePage('notes')}>
             <div className="stat-icon purple">
               <FileText size={22} />
             </div>
@@ -209,15 +209,15 @@ export default function Dashboard() {
               {t('dashboard.quickActions')}
             </h3>
             <div className="flex flex-col gap-2">
-              <button className="btn btn-secondary text-left w-full justify-between" onClick={() => setActivePage('notes', { fromDashboard: true })}>
+              <button className="btn btn-secondary text-left w-full justify-between" onClick={() => setActivePage('notes')}>
                 <span>{t('dashboard.newNote')}</span>
                 <FileText size={14} />
               </button>
-              <button className="btn btn-secondary text-left w-full justify-between" onClick={() => setActivePage('contacts', { fromDashboard: true })}>
+              <button className="btn btn-secondary text-left w-full justify-between" onClick={() => setActivePage('contacts')}>
                 <span>{t('nav.contacts')}</span>
                 <Users2 size={14} />
               </button>
-              <button className="btn btn-secondary text-left w-full justify-between" onClick={() => setActivePage('settings', { fromDashboard: true })}>
+              <button className="btn btn-secondary text-left w-full justify-between" onClick={() => setActivePage('settings')}>
                 <span>{t('nav.settings')}</span>
                 <Plus size={14} />
               </button>

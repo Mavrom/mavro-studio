@@ -14,7 +14,7 @@ import Settings from './pages/Settings'
 import BackButton from './components/common/BackButton'
 
 function App() {
-  const { activePage, setTheme, setLanguage, isFromDashboard, setActivePage } = useAppStore()
+  const { activePage, setTheme, setLanguage, setActivePage } = useAppStore()
 
   const [updateInfo, setUpdateInfo] = useState<{ version: string } | null>(null)
   const [updateDownloading, setUpdateDownloading] = useState(false)
@@ -72,7 +72,7 @@ function App() {
     }
   }
 
-  const showSidebar = !isFromDashboard || activePage === 'dashboard' || activePage === 'home'
+  const showSidebar = activePage === 'dashboard' || activePage === 'home'
 
   return (
     <>
