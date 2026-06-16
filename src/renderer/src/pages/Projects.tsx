@@ -400,11 +400,12 @@ export default function Projects() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: 'var(--text-muted)',
+                        color: 'color-mix(in srgb, var(--col-color) 55%, var(--text-muted))',
                         fontSize: 'var(--font-xs)',
-                        border: '1px dashed color-mix(in srgb, var(--col-color) 28%, var(--border-primary))',
+                        fontWeight: 500,
+                        border: '1.5px dashed color-mix(in srgb, var(--col-color) 38%, var(--border-primary))',
                         borderRadius: 'var(--radius-lg)',
-                        background: 'color-mix(in srgb, var(--col-color) 4%, transparent)'
+                        background: 'color-mix(in srgb, var(--col-color) 7%, transparent)'
                       }}
                     >
                       {t('projects.noProjects') || 'Boş'}

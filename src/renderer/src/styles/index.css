@@ -2072,15 +2072,19 @@ tr:hover td {
   max-height: 100%;
   padding: var(--space-2);
   border-radius: var(--radius-xl);
-  border: 1px solid var(--border-primary);
-  border-top: 2px solid var(--col-color, var(--accent-primary));
+  border: 1px solid color-mix(in srgb, var(--col-color, var(--accent-primary)) 22%, var(--border-primary));
+  border-top: 3px solid var(--col-color, var(--accent-primary));
   background:
     linear-gradient(180deg,
-      color-mix(in srgb, var(--col-color, var(--accent-primary)) 10%, transparent) 0%,
-      color-mix(in srgb, var(--col-color, var(--accent-primary)) 3%, transparent) 34%,
-      transparent 64%),
+      color-mix(in srgb, var(--col-color, var(--accent-primary)) 28%, transparent) 0%,
+      color-mix(in srgb, var(--col-color, var(--accent-primary)) 12%, transparent) 26%,
+      color-mix(in srgb, var(--col-color, var(--accent-primary)) 4%, transparent) 55%,
+      transparent 88%),
     var(--bg-secondary);
-  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  box-shadow:
+    var(--shadow-md),
+    inset 0 1px 0 color-mix(in srgb, var(--col-color, var(--accent-primary)) 40%, transparent),
+    inset 0 12px 28px -16px color-mix(in srgb, var(--col-color, var(--accent-primary)) 60%, transparent);
   transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 
@@ -2088,7 +2092,9 @@ tr:hover td {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-2) var(--space-2) var(--space-1);
+  padding: var(--space-2) var(--space-2) var(--space-2);
+  margin-bottom: var(--space-1);
+  border-bottom: 1px solid color-mix(in srgb, var(--col-color, var(--accent-primary)) 22%, transparent);
   flex-shrink: 0;
 }
 
@@ -2101,14 +2107,15 @@ tr:hover td {
   color: var(--col-color, var(--text-secondary));
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  text-shadow: 0 0 16px color-mix(in srgb, var(--col-color, var(--accent-primary)) 45%, transparent);
 }
 
 .kanban-column-count {
   font-size: var(--font-xs);
   font-weight: 700;
   color: var(--col-color, var(--text-muted));
-  background: color-mix(in srgb, var(--col-color, var(--accent-primary)) 14%, transparent);
-  border: 1px solid color-mix(in srgb, var(--col-color, var(--accent-primary)) 30%, transparent);
+  background: color-mix(in srgb, var(--col-color, var(--accent-primary)) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--col-color, var(--accent-primary)) 42%, transparent);
   padding: 2px 9px;
   border-radius: 999px;
   font-family: var(--font-mono);
