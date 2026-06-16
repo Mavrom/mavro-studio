@@ -93,13 +93,21 @@ const DEFAULT_PROJECTS: Project[] = [
   }
 ]
 
-const COLUMNS: { id: ProjectStatus; labelKey: string; colorClass: string }[] = [
-  { id: 'draft', labelKey: 'projects.draft', colorClass: 'draft' },
-  { id: 'production', labelKey: 'projects.production', colorClass: 'production' },
-  { id: 'post', labelKey: 'projects.postProduction', colorClass: 'post' },
-  { id: 'published', labelKey: 'projects.published', colorClass: 'published' },
-  { id: 'cancelled', labelKey: 'projects.cancelled', colorClass: 'cancelled' }
+const COLUMNS: { id: ProjectStatus; labelKey: string; colorClass: string; color: string }[] = [
+  { id: 'draft', labelKey: 'projects.draft', colorClass: 'draft', color: '#8b95a5' },
+  { id: 'production', labelKey: 'projects.production', colorClass: 'production', color: '#4F8FFF' },
+  { id: 'post', labelKey: 'projects.postProduction', colorClass: 'post', color: '#A78BFA' },
+  { id: 'published', labelKey: 'projects.published', colorClass: 'published', color: '#34D399' },
+  { id: 'cancelled', labelKey: 'projects.cancelled', colorClass: 'cancelled', color: '#F87171' }
 ]
+
+const STATUS_COLOR: Record<ProjectStatus, string> = {
+  draft: '#8b95a5',
+  production: '#4F8FFF',
+  post: '#A78BFA',
+  published: '#34D399',
+  cancelled: '#F87171'
+}
 
 export default function Projects() {
   const { t, addToast } = useAppStore()
@@ -344,7 +352,8 @@ export default function Projects() {
         {COLUMNS.map(col => (
           <div
             key={col.id}
-            className="kanban-badge"
+            className={`kanban-badge ${col.colorClass}`}
+            style={{ '--col-color': col.color } as React.CSSProperties}
             onClick={() => scrollToColumn(col.id)}
           >
             <span className={`kanban-badge-dot ${col.colorClass}`} />
@@ -365,7 +374,8 @@ export default function Projects() {
               <div
                 key={col.id}
                 id={`kanban-col-${col.id}`}
-                className={`kanban-column ${isOver ? 'drag-over' : ''}`}
+                className={`kanban-column ${col.colorClass} ${isOver ? 'drag-over' : ''}`}
+                style={{ '--col-color': col.color } as React.CSSProperties}
                 onDragOver={(e) => handleDragOver(e, col.id)}
                 onDrop={(e) => handleDrop(e, col.id)}
               >
@@ -392,9 +402,9 @@ export default function Projects() {
                         justifyContent: 'center',
                         color: 'var(--text-muted)',
                         fontSize: 'var(--font-xs)',
-                        border: '1px dashed var(--border-primary)',
+                        border: '1px dashed color-mix(in srgb, var(--col-color) 28%, var(--border-primary))',
                         borderRadius: 'var(--radius-lg)',
-                        background: 'rgba(0,0,0,0.05)'
+                        background: 'color-mix(in srgb, var(--col-color) 4%, transparent)'
                       }}
                     >
                       {t('projects.noProjects') || 'Boş'}
@@ -405,7 +415,8 @@ export default function Projects() {
                       return (
                         <div
                           key={p.id}
-                          className={`kanban-card ${isDragging ? 'dragging' : ''}`}
+                          className={`kanban-card ${col.colorClass} ${isDragging ? 'dragging' : ''}`}
+                          style={{ '--col-color': STATUS_COLOR[p.status] } as React.CSSProperties}
                           draggable="true"
                           onDragStart={(e) => handleDragStart(e, p.id)}
                           onDragEnd={handleDragEnd}
