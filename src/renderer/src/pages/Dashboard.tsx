@@ -108,10 +108,10 @@ export default function Dashboard() {
             </p>
           </div>
           <button
-            className="btn btn-secondary btn-sm"
-            onClick={() => handleAction('Explore Tools', 'tools')}
+            className="btn btn-primary btn-sm"
+            onClick={() => setActivePage('projects')}
           >
-            {t('nav.tools')}
+            {t('nav.projects')}
             <ArrowRight size={14} />
           </button>
         </div>
