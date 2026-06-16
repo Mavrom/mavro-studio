@@ -321,21 +321,23 @@ export default function Projects() {
       </div>
 
       {/* Top Filter and Search Bar */}
-      <div className="top-nav" style={{ padding: '0 var(--space-4) var(--space-3)' }}>
-        <div
-          className={`tab ${activeTab === 'all' ? 'active' : ''}`}
-          onClick={() => setActiveTab('all')}
-        >
-          {t('projects.all')}
+      <div className="projects-toolbar">
+        <div className="seg-tabs">
+          <button
+            className={`seg-tab ${activeTab === 'all' ? 'active' : ''}`}
+            onClick={() => setActiveTab('all')}
+          >
+            {t('projects.all')}
+          </button>
+          <button
+            className={`seg-tab ${activeTab === 'favorites' ? 'active' : ''}`}
+            onClick={() => setActiveTab('favorites')}
+          >
+            <Star size={13} fill={activeTab === 'favorites' ? 'currentColor' : 'none'} />
+            {t('projects.favorites')}
+          </button>
         </div>
-        <div
-          className={`tab ${activeTab === 'favorites' ? 'active' : ''}`}
-          onClick={() => setActiveTab('favorites')}
-        >
-          {t('projects.favorites')}
-        </div>
-        <div className="top-nav-spacer" />
-        <div className="search-input-wrapper">
+        <div className="search-input-wrapper projects-search">
           <Search size={16} />
           <input
             type="text"
@@ -348,7 +350,7 @@ export default function Projects() {
       </div>
 
       {/* Kanban Filter Badges Row */}
-      <div className="kanban-filter-bar" style={{ padding: '0 var(--space-4) var(--space-3)' }}>
+      <div className="kanban-filter-bar">
         {COLUMNS.map(col => (
           <div
             key={col.id}
