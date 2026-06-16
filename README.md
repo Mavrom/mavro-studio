@@ -4,7 +4,7 @@
 
 # Mavro Studio
 
-**Mavro ekibi için tasarlanmış premium masaüstü yönetim aracı.**  
+** Premium masaüstü yönetim aracı.**  
 Projelerini, notlarını, kişilerini ve güvenliğini tek bir şık arayüzde yönet.
 
 [![Release](https://img.shields.io/github/v/release/Mavrom/mavro-studio?style=flat-square&color=4F8FFF)](https://github.com/Mavrom/mavro-studio/releases/latest)
