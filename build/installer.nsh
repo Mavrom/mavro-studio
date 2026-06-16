@@ -2,31 +2,8 @@
 ; Mavro Studio - Custom NSIS Installer Script
 ; ================================================================
 
-; Mevcut kurulum kontrolü: Repair / Kaldır / İptal
+; Mevcut kurulum varsa direkt güncellemeye devam et (diyalog gösterme)
 !macro customInit
-  ${If} ${Silent}
-    ; Sessiz kurulum durumunda es geç
-  ${Else}
-    ; Önce kullanıcı başına (HKCU) kurulumu kontrol et
-    ReadRegStr $R0 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${UNINSTALL_APP_KEY}" "UninstallString"
-    ${If} $R0 == ""
-      ; Tüm kullanıcılar (HKLM) kurulumunu kontrol et
-      ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${UNINSTALL_APP_KEY}" "UninstallString"
-    ${EndIf}
-
-    ${If} $R0 != ""
-      MessageBox MB_YESNOCANCEL|MB_ICONQUESTION \
-        "Mavro Studio zaten bilgisayarınızda yüklü!$\n$\n\
-Ne yapmak istersiniz?$\n$\n\
-  Evet   → Onar / Yeniden Yükle$\n\
-  Hayır  → Uygulamayı Kaldır$\n\
-  İptal  → Kurulumdan Çık" \
-        IDYES continueInstall IDNO doUninstall
-      Abort
-      doUninstall:
-        ExecWait '$R0'
-        Abort
-      continueInstall:
-    ${EndIf}
-  ${EndIf}
+  ; Sessiz modda veya normal güncelleme sırasında hiçbir diyalog gösterme
+  ; autoUpdater.quitAndInstall(true, true) ile sessiz modda çalışır
 !macroend

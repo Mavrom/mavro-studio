@@ -197,7 +197,9 @@ ipcMain.handle('updater:download', () => {
 })
 
 ipcMain.handle('updater:install', () => {
-  autoUpdater.quitAndInstall()
+  // isSilent=true: setup sihirbazı gösterme, arka planda güncelle
+  // isForceRunAfter=true: güncelleme sonrası uygulamayı otomatik başlat
+  autoUpdater.quitAndInstall(true, true)
 })
 
 // App data (projects, notes, contacts)
