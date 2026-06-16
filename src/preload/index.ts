@@ -39,6 +39,10 @@ const api = {
     ipcRenderer.on('updater:update-downloaded', () => callback())
   },
 
+  // File system
+  pathInfo: (path: string) => ipcRenderer.invoke('fs:pathInfo', path),
+  readDir: (path: string) => ipcRenderer.invoke('fs:readDir', path),
+
   // Shell
   openPath: (path: string) => ipcRenderer.invoke('shell:openPath', path),
   openExternal: (url: string) => ipcRenderer.invoke('shell:openExternal', url),

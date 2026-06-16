@@ -1,5 +1,5 @@
 import { app, shell, BrowserWindow, ipcMain, nativeTheme, dialog } from 'electron'
-import { join } from 'path'
+import { join, basename } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { autoUpdater } from 'electron-updater'
 import Store from 'electron-store'
@@ -210,6 +210,55 @@ ipcMain.handle('appdata:get', (_event, key: string) => {
 ipcMain.handle('appdata:set', (_event, key: string, value: unknown) => {
   dataStore.set(key, value)
   return true
+})
+
+// File system info (project folders)
+ipcMain.handle('fs:pathInfo', async (_event, targetPath: string) => {
+  if (!targetPath) return { exists: false, name: '', path: targetPath, isDirectory: false, size: 0, createdAt: null, modifiedAt: null }
+  const fs = await import('fs/promises')
+  try {
+    const stat = await fs.stat(targetPath)
+    return {
+      exists: true,
+      name: basename(targetPath),
+      path: targetPath,
+      isDirectory: stat.isDirectory(),
+      size: stat.size,
+      createdAt: stat.birthtime.toISOString(),
+      modifiedAt: stat.mtime.toISOString()
+    }
+  } catch {
+    return { exists: false, name: basename(targetPath || ''), path: targetPath, isDirectory: false, size: 0, createdAt: null, modifiedAt: null }
+  }
+})
+
+ipcMain.handle('fs:readDir', async (_event, targetPath: string) => {
+  if (!targetPath) return null
+  const fs = await import('fs/promises')
+  try {
+    const entries = await fs.readdir(targetPath, { withFileTypes: true })
+    const items = await Promise.all(
+      entries.map(async (e) => {
+        const full = join(targetPath, e.name)
+        let size = 0
+        let modifiedAt: string | null = null
+        try {
+          const st = await fs.stat(full)
+          size = st.size
+          modifiedAt = st.mtime.toISOString()
+        } catch {
+          // ignore unreadable entries
+        }
+        return { name: e.name, path: full, isDirectory: e.isDirectory(), size, modifiedAt }
+      })
+    )
+    items.sort((a, b) =>
+      a.isDirectory === b.isDirectory ? a.name.localeCompare(b.name) : a.isDirectory ? -1 : 1
+    )
+    return items
+  } catch {
+    return null
+  }
 })
 
 // Shell operations

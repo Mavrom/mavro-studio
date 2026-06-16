@@ -18,12 +18,32 @@ interface ElectronAPI {
   onUpdateAvailable: (callback: (info: unknown) => void) => void
   onDownloadProgress: (callback: (progress: unknown) => void) => void
   onUpdateDownloaded: (callback: () => void) => void
+  pathInfo: (path: string) => Promise<PathInfo>
+  readDir: (path: string) => Promise<DirEntry[] | null>
   openPath: (path: string) => Promise<string>
   openExternal: (url: string) => Promise<void>
   clearLogs: () => Promise<boolean>
   getLogsPath: () => Promise<string>
   getData: (key: string) => Promise<unknown>
   setData: (key: string, value: unknown) => Promise<boolean>
+}
+
+interface PathInfo {
+  exists: boolean
+  name: string
+  path: string
+  isDirectory: boolean
+  size: number
+  createdAt: string | null
+  modifiedAt: string | null
+}
+
+interface DirEntry {
+  name: string
+  path: string
+  isDirectory: boolean
+  size: number
+  modifiedAt: string | null
 }
 
 interface SystemInfo {
