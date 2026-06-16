@@ -11,9 +11,10 @@ import Projects from './pages/Projects'
 import Notes from './pages/Notes'
 import Contacts from './pages/Contacts'
 import Settings from './pages/Settings'
+import BackButton from './components/common/BackButton'
 
 function App() {
-  const { activePage, setTheme, setLanguage } = useAppStore()
+  const { activePage, setTheme, setLanguage, isFromDashboard, setActivePage } = useAppStore()
 
   const [updateInfo, setUpdateInfo] = useState<{ version: string } | null>(null)
   const [updateDownloading, setUpdateDownloading] = useState(false)
@@ -71,12 +72,19 @@ function App() {
     }
   }
 
+  const showSidebar = !isFromDashboard || activePage === 'dashboard' || activePage === 'home'
+
   return (
     <>
       <TitleBar />
       <div className="app-container">
-        <Sidebar />
+        {showSidebar && <Sidebar />}
         <main className="main-content">
+          {!showSidebar && (
+            <div style={{ padding: 'var(--space-4) var(--space-8) 0', display: 'flex', alignItems: 'center' }}>
+              <BackButton onClick={() => setActivePage('dashboard')} />
+            </div>
+          )}
           {renderPage()}
         </main>
       </div>

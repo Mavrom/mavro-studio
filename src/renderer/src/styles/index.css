@@ -1918,3 +1918,69 @@ tr:hover td {
 .date-picker-day.today {
   border: 1px solid var(--accent-primary);
 }
+
+/* =================== BACK BUTTON (OLED Black, custom animation) =================== */
+.back-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  width: 90px;
+  background: #020202 !important; /* Force OLED Black */
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  cursor: pointer;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  font-size: var(--font-sm);
+  font-weight: 500;
+  transition: border-color var(--transition-fast);
+  padding: 0;
+  -webkit-app-region: no-drag;
+}
+
+.back-button:hover {
+  border-color: var(--border-hover);
+  /* No background color changes or greying out on hover as requested */
+}
+
+.back-button-text {
+  width: 100%;
+  text-align: center;
+  padding-left: 20px; /* Offset for the icon on the left */
+  transition: opacity var(--transition-base), transform var(--transition-base);
+}
+
+.back-button:hover .back-button-text {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.back-button-icon-wrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 30px;
+  display: grid;
+  place-items: center;
+  transition: width var(--transition-base);
+  background: transparent; /* No grey overlay on hover */
+  z-index: 10;
+}
+
+.back-button:hover .back-button-icon-wrapper {
+  width: 100%;
+}
+
+.back-button-icon {
+  color: var(--text-primary);
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+.back-button:hover .back-button-icon {
+  opacity: 1;
+}

@@ -20,7 +20,8 @@ interface AppState {
 
   // Active page
   activePage: string
-  setActivePage: (page: string) => void
+  setActivePage: (page: string, options?: { fromDashboard?: boolean }) => void
+  isFromDashboard: boolean
 
   // Notifications
   notifications: Notification[]
@@ -89,7 +90,8 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   // Active page
   activePage: 'home',
-  setActivePage: (page) => set({ activePage: page }),
+  isFromDashboard: false,
+  setActivePage: (page, options) => set({ activePage: page, isFromDashboard: !!options?.fromDashboard }),
 
   // Notifications
   notifications: [],
