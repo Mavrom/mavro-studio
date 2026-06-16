@@ -186,8 +186,9 @@ ipcMain.handle('updater:check', async () => {
     const latestVersion = result.updateInfo.version
     if (latestVersion === currentVersion) return null
     return result.updateInfo
-  } catch {
-    return null
+  } catch (err) {
+    console.error('Auto-updater check error:', err)
+    return { error: true, message: String(err) }
   }
 })
 
@@ -253,8 +254,17 @@ app.whenReady().then(() => {
     autoUpdater.autoDownload = false
     autoUpdater.autoInstallOnAppQuit = true
 
+    autoUpdater.on('error', (err) => {
+      console.error('AutoUpdater error:', err)
+    })
+
     autoUpdater.on('update-available', (info) => {
+      console.log('Update available:', info.version)
       mainWindow?.webContents.send('updater:update-available', info)
+    })
+
+    autoUpdater.on('update-not-available', (info) => {
+      console.log('No update available. Current version is up to date:', info.version)
     })
 
     autoUpdater.on('download-progress', (progress) => {
@@ -265,8 +275,13 @@ app.whenReady().then(() => {
       mainWindow?.webContents.send('updater:update-downloaded')
     })
 
+    // Check for updates after window is ready (with small delay to ensure network is ready)
     if (store.get('autoUpdate')) {
-      autoUpdater.checkForUpdates()
+      setTimeout(() => {
+        autoUpdater.checkForUpdates().catch(err => {
+          console.error('Startup update check failed:', err)
+        })
+      }, 5000)
     }
   }
 

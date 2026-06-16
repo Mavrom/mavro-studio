@@ -224,6 +224,7 @@
     "website": "Website",
     "noUpdate": "No updates available, you're on the latest version",
     "updateAvailable": "Update available!",
+    "updateCheckFailed": "Update check failed. Please check your internet connection.",
     "downloading": "Downloading...",
     "profileName": "Name",
     "profileEmail": "Email",

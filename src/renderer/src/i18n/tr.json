@@ -224,6 +224,7 @@
     "website": "Web Sitesi",
     "noUpdate": "Güncelleme yok, en son sürümü kullanıyorsunuz",
     "updateAvailable": "Güncelleme mevcut!",
+    "updateCheckFailed": "Güncelleme kontrolü başarısız oldu. Lütfen internet bağlantınızı kontrol edin.",
     "downloading": "İndiriliyor...",
     "profileName": "Ad",
     "profileEmail": "E-posta",

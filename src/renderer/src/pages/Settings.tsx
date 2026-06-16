@@ -105,17 +105,20 @@ export default function Settings() {
     setCheckingUpdate(true)
     try {
       if (window.api) {
-        const result = await window.api.checkForUpdates() as { version: string } | null
-        if (result?.version) {
+        const result = await window.api.checkForUpdates() as { version?: string; error?: boolean } | null
+        if (result && result.error) {
+          addToast({ message: t('settings.updateCheckFailed'), type: 'error' })
+        } else if (result?.version) {
           addToast({ message: `${t('settings.updateAvailable')} v${result.version}`, type: 'info' })
         } else {
           addToast({ message: t('settings.noUpdate'), type: 'success' })
         }
       } else {
-        addToast({ message: t('settings.noUpdate'), type: 'success' })
+        addToast({ message: t('settings.updateCheckFailed'), type: 'error' })
       }
-    } catch {
-      addToast({ message: t('settings.noUpdate'), type: 'success' })
+    } catch (err) {
+      console.error('Update check failed:', err)
+      addToast({ message: t('settings.updateCheckFailed'), type: 'error' })
     } finally {
       setCheckingUpdate(false)
     }
