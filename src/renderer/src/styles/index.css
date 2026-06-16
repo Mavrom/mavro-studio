@@ -539,7 +539,7 @@ a:hover {
 }
 
 .page-header {
-  padding: var(--space-6) var(--space-8) var(--space-4);
+  padding: var(--space-5) var(--space-6) var(--space-4);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1925,8 +1925,8 @@ tr:hover td {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 32px;
-  width: 90px;
+  height: 28px;
+  width: 76px;
   background: #020202 !important; /* Force OLED Black */
   border: 1px solid var(--border-primary);
   border-radius: var(--radius-md);
@@ -1934,7 +1934,7 @@ tr:hover td {
   cursor: pointer;
   overflow: hidden;
   font-family: var(--font-sans);
-  font-size: var(--font-sm);
+  font-size: var(--font-xs);
   font-weight: 500;
   transition: border-color var(--transition-fast);
   padding: 0;
@@ -1963,11 +1963,11 @@ tr:hover td {
   left: 0;
   top: 0;
   bottom: 0;
-  width: 30px;
+  width: 26px;
   display: grid;
   place-items: center;
   transition: width var(--transition-base);
-  background: transparent; /* No grey overlay on hover */
+  background: transparent;
   z-index: 10;
 }
 
