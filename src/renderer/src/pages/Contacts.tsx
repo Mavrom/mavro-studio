@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAppStore } from '../store'
 import { Search, Plus, Trash2, Edit2, User, Key, Phone, Calendar, Info, Eye, EyeOff } from 'lucide-react'
+import BackButton from '../components/common/BackButton'
 
 interface Contact {
   id: string
@@ -359,9 +360,12 @@ export default function Contacts() {
   return (
     <div className="animate-fade-in">
       <div className="page-header">
-        <div>
-          <h1 className="page-title">{t('contacts.title')}</h1>
-          <p className="page-subtitle">{t('contacts.subtitle')}</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+          <BackButton />
+          <div>
+            <h1 className="page-title">{t('contacts.title')}</h1>
+            <p className="page-subtitle">{t('contacts.subtitle')}</p>
+          </div>
         </div>
         <button
           className="btn btn-primary"

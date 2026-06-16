@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAppStore } from '../store'
 import { Search, Plus, Trash2, FileText, Save } from 'lucide-react'
+import BackButton from '../components/common/BackButton'
 
 interface Note {
   id: string
@@ -116,9 +117,12 @@ export default function Notes() {
   return (
     <div className="animate-fade-in" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div className="page-header">
-        <div>
-          <h1 className="page-title">{t('notes.title')}</h1>
-          <p className="page-subtitle">{t('notes.subtitle')}</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+          <BackButton />
+          <div>
+            <h1 className="page-title">{t('notes.title')}</h1>
+            <p className="page-subtitle">{t('notes.subtitle')}</p>
+          </div>
         </div>
       </div>
 

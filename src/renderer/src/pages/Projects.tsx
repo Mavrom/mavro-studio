@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAppStore } from '../store'
 import { FolderGit2, Search, Plus, Star, ExternalLink, Trash2 } from 'lucide-react'
+import BackButton from '../components/common/BackButton'
 
 interface Project {
   id: string
@@ -99,9 +100,12 @@ export default function Projects() {
   return (
     <div className="animate-fade-in">
       <div className="page-header">
-        <div>
-          <h1 className="page-title">{t('projects.title')}</h1>
-          <p className="page-subtitle">{t('projects.subtitle')}</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+          <BackButton />
+          <div>
+            <h1 className="page-title">{t('projects.title')}</h1>
+            <p className="page-subtitle">{t('projects.subtitle')}</p>
+          </div>
         </div>
         <button className="btn btn-primary" onClick={addNewProject}>
           <Plus size={16} />
