@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import BackButton from '../components/common/BackButton'
 
-export type ProjectStatus = 'draft' | 'production' | 'post' | 'published' | 'cancelled'
+export type ProjectStatus = 'draft' | 'production' | 'published' | 'cancelled'
 
 export interface Project {
   id: string
@@ -69,7 +69,7 @@ const DEFAULT_PROJECTS: Project[] = [
     id: '3',
     name: '🤫 Gizli Görev: Güvenlikçi Oldum',
     description: 'GİZLİ GÖREV',
-    status: 'post',
+    status: 'production',
     creator: 'Orkun Işıtmak',
     platform: 'YouTube',
     shootDate: '2026-06-05',
@@ -126,7 +126,6 @@ const DEFAULT_PROJECTS: Project[] = [
 const COLUMNS: { id: ProjectStatus; labelKey: string; colorClass: string; color: string }[] = [
   { id: 'draft', labelKey: 'projects.draft', colorClass: 'draft', color: '#8b95a5' },
   { id: 'production', labelKey: 'projects.production', colorClass: 'production', color: '#4F8FFF' },
-  { id: 'post', labelKey: 'projects.postProduction', colorClass: 'post', color: '#A78BFA' },
   { id: 'published', labelKey: 'projects.published', colorClass: 'published', color: '#34D399' },
   { id: 'cancelled', labelKey: 'projects.cancelled', colorClass: 'cancelled', color: '#F87171' }
 ]
@@ -134,10 +133,11 @@ const COLUMNS: { id: ProjectStatus; labelKey: string; colorClass: string; color:
 const STATUS_COLOR: Record<ProjectStatus, string> = {
   draft: '#8b95a5',
   production: '#4F8FFF',
-  post: '#A78BFA',
   published: '#34D399',
   cancelled: '#F87171'
 }
+
+const VALID_STATUSES: ProjectStatus[] = ['draft', 'production', 'published', 'cancelled']
 
 const COLLAPSE_KEY = 'mavro.kanban.collapsed'
 
@@ -195,12 +195,18 @@ export default function Projects() {
   const [showMore, setShowMore] = useState(false)
 
   useEffect(() => {
+    const migrate = (list: Project[]) =>
+      list.map(p => ({
+        ...p,
+        // Kaldırılan "Test" sütunundaki projeleri Geliştirme'ye taşı
+        status: (VALID_STATUSES.includes(p.status) ? p.status : 'production') as ProjectStatus
+      }))
     const load = async () => {
       if (window.api) {
         const saved = await window.api.getData('projects') as Project[]
-        setProjects(saved && saved.length > 0 ? saved : DEFAULT_PROJECTS)
+        setProjects(migrate(saved && saved.length > 0 ? saved : DEFAULT_PROJECTS))
       } else {
-        setProjects(DEFAULT_PROJECTS)
+        setProjects(migrate(DEFAULT_PROJECTS))
       }
       setLoaded(true)
     }
