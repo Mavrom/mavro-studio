@@ -27,6 +27,7 @@ export default function Notes() {
   const editorRef = useRef<HTMLTextAreaElement>(null)
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null)
   const [openSub, setOpenSub] = useState<string | null>(null)
+  const [isPreview, setIsPreview] = useState(false)
 
   useEffect(() => {
     const load = async () => {
@@ -225,6 +226,138 @@ export default function Notes() {
   const wordCount = activeNote ? (activeNote.content.trim().match(/\S+/g)?.length ?? 0) : 0
   const charCount = activeNote ? activeNote.content.length : 0
 
+  const renderMarkdown = (md: string) => {
+    if (!md) return <div className="markdown-placeholder">{t('notes.contentPlaceholder') || 'Boş not...'}</div>
+
+    // Escape HTML first to prevent XSS
+    let html = md
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+
+    // Helper: Code blocks
+    const codeBlocks: string[] = []
+    html = html.replace(/```([\s\S]*?)```/g, (_, code) => {
+      const id = `__CODE_BLOCK_${codeBlocks.length}__`
+      codeBlocks.push(code.trim())
+      return id
+    })
+
+    // Helper: Inline code
+    const inlineCodes: string[] = []
+    html = html.replace(/`([^`\n]+)`/g, (_, code) => {
+      const id = `__INLINE_CODE_${inlineCodes.length}__`
+      inlineCodes.push(code)
+      return id
+    })
+
+    // Parse Wiki Links: [[Note Title]]
+    html = html.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (match, noteTitle, customLabel) => {
+      const title = noteTitle.trim()
+      const label = (customLabel || title).trim()
+      return `<a href="#" class="wiki-link" data-note-title="${title}">${label}</a>`
+    })
+
+    // Parse Standard Links: [label](url)
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+
+    // Parse Bold: **text**
+    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    
+    // Parse Italic: *text*
+    html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>')
+
+    // Parse Strikethrough: ~~text~~
+    html = html.replace(/~~([^~]+)~~/g, '<del>$1</del>')
+
+    // Parse Highlight: ==text==
+    html = html.replace(/==([^=]+)==/g, '<mark>$1</mark>')
+
+    // Parse Headings
+    html = html.replace(/^# (.*?)$/gm, '<h1>$1</h1>')
+    html = html.replace(/^## (.*?)$/gm, '<h2>$1</h2>')
+    html = html.replace(/^### (.*?)$/gm, '<h3>$1</h3>')
+
+    // Parse Horizontal Rule
+    html = html.replace(/^---$/gm, '<hr />')
+
+    // Parse Blockquotes
+    html = html.replace(/^&gt; (.*?)$/gm, '<blockquote>$1</blockquote>')
+
+    // Parse Lists
+    html = html.replace(/^- \[ \] (.*?)$/gm, '<li><input type="checkbox" disabled /> $1</li>')
+    html = html.replace(/^- \[x\] (.*?)$/gm, '<li><input type="checkbox" checked disabled /> $1</li>')
+    html = html.replace(/^- (.*?)$/gm, '<li>$1</li>')
+    html = html.replace(/^\d+\. (.*?)$/gm, '<li>$1</li>')
+
+    // Re-insert inline codes
+    inlineCodes.forEach((code, index) => {
+      html = html.replace(`__INLINE_CODE_${index}__`, `<code>${code}</code>`)
+    })
+
+    // Re-insert code blocks
+    codeBlocks.forEach((code, index) => {
+      html = html.replace(`__CODE_BLOCK_${index}__`, `<pre><code>${code}</code></pre>`)
+    })
+
+    const lines = html.split('\n')
+    let processedHtml = ''
+    let inList = false
+
+    lines.forEach((line) => {
+      const trimmed = line.trim()
+      if (trimmed.startsWith('<li>')) {
+        if (!inList) {
+          processedHtml += '<ul class="markdown-list">'
+          inList = true
+        }
+        processedHtml += line
+      } else {
+        if (inList) {
+          processedHtml += '</ul>'
+          inList = false
+        }
+        if (trimmed === '') {
+          processedHtml += '<div class="markdown-para-space"></div>'
+        } else if (
+          trimmed.startsWith('<h') ||
+          trimmed.startsWith('<blockquote') ||
+          trimmed.startsWith('<pre') ||
+          trimmed.startsWith('<hr')
+        ) {
+          processedHtml += line
+        } else {
+          processedHtml += `<p>${line}</p>`
+        }
+      }
+    })
+    if (inList) {
+      processedHtml += '</ul>'
+    }
+
+    return (
+      <div 
+        className="markdown-content"
+        dangerouslySetInnerHTML={{ __html: processedHtml }}
+        onClick={(e) => {
+          const target = e.target as HTMLElement
+          if (target.classList.contains('wiki-link')) {
+            e.preventDefault()
+            const title = target.getAttribute('data-note-title')
+            if (title) {
+              const found = notes.find(n => n.title.toLowerCase() === title.toLowerCase())
+              if (found) {
+                setActiveNoteId(found.id)
+              } else {
+                addToast({ message: `Not bulunamadı: "${title}"`, type: 'info' })
+              }
+            }
+          }
+        }}
+      />
+    )
+  }
+
   return (
     <div className="animate-fade-in" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div className="page-header notes-page-header">
@@ -295,28 +428,52 @@ export default function Notes() {
         {/* Sağ: editör */}
         {activeNote ? (
           <section className="notes-editor-pane">
-            <input
-              type="text"
-              className="notes-title-input"
-              value={activeNote.title}
-              onChange={(e) => updateTitle(e.target.value)}
-              placeholder={t('notes.untitled')}
-            />
-            <textarea
-              ref={editorRef}
-              className="obsidian-editor"
-              spellCheck={false}
-              placeholder={t('notes.contentPlaceholder') || 'Yazmaya başla… (sağ tıkla biçimlendir)'}
-              value={activeNote.content}
-              onChange={(e) => updateContent(e.target.value)}
-              onContextMenu={openMenu}
-              onKeyDown={(e) => {
-                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
-                  e.preventDefault()
-                  handleSave()
-                }
-              }}
-            />
+            <div className="notes-editor-header">
+              <input
+                type="text"
+                className="notes-title-input"
+                value={activeNote.title}
+                onChange={(e) => updateTitle(e.target.value)}
+                placeholder={t('notes.untitled')}
+              />
+              <div className="notes-editor-actions">
+                <button
+                  className={`notes-toggle-btn ${!isPreview ? 'active' : ''}`}
+                  onClick={() => setIsPreview(false)}
+                >
+                  <FileText size={14} /> {t('notes.edit', 'Düzenle')}
+                </button>
+                <button
+                  className={`notes-toggle-btn ${isPreview ? 'active' : ''}`}
+                  onClick={() => setIsPreview(true)}
+                >
+                  <Check size={14} /> {t('notes.preview', 'Önizleme')}
+                </button>
+              </div>
+            </div>
+
+            {!isPreview ? (
+              <textarea
+                ref={editorRef}
+                className="obsidian-editor"
+                spellCheck={false}
+                placeholder={t('notes.contentPlaceholder') || 'Yazmaya başla… (sağ tıkla biçimlendir)'}
+                value={activeNote.content}
+                onChange={(e) => updateContent(e.target.value)}
+                onContextMenu={openMenu}
+                onKeyDown={(e) => {
+                  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+                    e.preventDefault()
+                    handleSave()
+                  }
+                }}
+              />
+            ) : (
+              <div className="obsidian-preview">
+                {renderMarkdown(activeNote.content)}
+              </div>
+            )}
+
             <div className="notes-statusbar">
               <span>{wordCount} kelime</span>
               <span className="notes-statusbar-dot">·</span>
@@ -351,10 +508,10 @@ export default function Notes() {
             style={{ top: menu.y, left: menu.x }}
             onMouseDown={(e) => e.preventDefault()}
           >
-            <button className="ctx-item" onMouseEnter={() => setOpenSub(null)} onClick={() => run(() => wrap('[[', ']]', 'not adı'))}>
+            <button className="ctx-item" onMouseEnter={() => setOpenSub(null)} onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(() => wrap('[[', ']]', 'not adı')); }}>
               <Link2 size={15} /> Bağlantı ekle
             </button>
-            <button className="ctx-item" onMouseEnter={() => setOpenSub(null)} onClick={() => run(insertExternalLink)}>
+            <button className="ctx-item" onMouseEnter={() => setOpenSub(null)} onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(insertExternalLink); }}>
               <ExternalLink size={15} /> Dış bağlantı ekle
             </button>
 
@@ -366,11 +523,11 @@ export default function Notes() {
               <ChevronRight size={14} className="ctx-arrow" />
               {openSub === 'format' && (
                 <div className="ctx-submenu">
-                  <button className="ctx-item" onClick={() => run(() => wrap('**', '**', 'kalın'))}><Bold size={15} /> Kalın</button>
-                  <button className="ctx-item" onClick={() => run(() => wrap('*', '*', 'italik'))}><Italic size={15} /> İtalik</button>
-                  <button className="ctx-item" onClick={() => run(() => wrap('~~', '~~', 'metin'))}><Strikethrough size={15} /> Üstü çizili</button>
-                  <button className="ctx-item" onClick={() => run(() => wrap('==', '==', 'vurgu'))}><Highlighter size={15} /> Vurgula</button>
-                  <button className="ctx-item" onClick={() => run(() => wrap('`', '`', 'kod'))}><Code size={15} /> Satır içi kod</button>
+                  <button className="ctx-item" onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(() => wrap('**', '**', 'kalın')); }}><Bold size={15} /> Kalın</button>
+                  <button className="ctx-item" onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(() => wrap('*', '*', 'italik')); }}><Italic size={15} /> İtalik</button>
+                  <button className="ctx-item" onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(() => wrap('~~', '~~', 'metin')); }}><Strikethrough size={15} /> Üstü çizili</button>
+                  <button className="ctx-item" onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(() => wrap('==', '==', 'vurgu')); }}><Highlighter size={15} /> Vurgula</button>
+                  <button className="ctx-item" onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(() => wrap('`', '`', 'kod')); }}><Code size={15} /> Satır içi kod</button>
                 </div>
               )}
             </div>
@@ -381,14 +538,14 @@ export default function Notes() {
               <ChevronRight size={14} className="ctx-arrow" />
               {openSub === 'paragraph' && (
                 <div className="ctx-submenu">
-                  <button className="ctx-item" onClick={() => run(() => linePrefix('# '))}><Heading1 size={15} /> Başlık 1</button>
-                  <button className="ctx-item" onClick={() => run(() => linePrefix('## '))}><Heading2 size={15} /> Başlık 2</button>
-                  <button className="ctx-item" onClick={() => run(() => linePrefix('### '))}><Heading3 size={15} /> Başlık 3</button>
+                  <button className="ctx-item" onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(() => linePrefix('# ')); }}><Heading1 size={15} /> Başlık 1</button>
+                  <button className="ctx-item" onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(() => linePrefix('## ')); }}><Heading2 size={15} /> Başlık 2</button>
+                  <button className="ctx-item" onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(() => linePrefix('### ')); }}><Heading3 size={15} /> Başlık 3</button>
                   <div className="ctx-sep" />
-                  <button className="ctx-item" onClick={() => run(() => linePrefix('> '))}><Quote size={15} /> Alıntı</button>
-                  <button className="ctx-item" onClick={() => run(() => linePrefix('- '))}><List size={15} /> Madde listesi</button>
-                  <button className="ctx-item" onClick={() => run(() => linePrefix('1. '))}><ListOrdered size={15} /> Numaralı liste</button>
-                  <button className="ctx-item" onClick={() => run(() => linePrefix('- [ ] '))}><ListChecks size={15} /> Görev listesi</button>
+                  <button className="ctx-item" onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(() => linePrefix('> ')); }}><Quote size={15} /> Alıntı</button>
+                  <button className="ctx-item" onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(() => linePrefix('- ')); }}><List size={15} /> Madde listesi</button>
+                  <button className="ctx-item" onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(() => linePrefix('1. ')); }}><ListOrdered size={15} /> Numaralı liste</button>
+                  <button className="ctx-item" onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(() => linePrefix('- [ ] ')); }}><ListChecks size={15} /> Görev listesi</button>
                 </div>
               )}
             </div>
@@ -399,23 +556,23 @@ export default function Notes() {
               <ChevronRight size={14} className="ctx-arrow" />
               {openSub === 'insert' && (
                 <div className="ctx-submenu">
-                  <button className="ctx-item" onClick={() => run(insertTable)}><Table size={15} /> Tablo</button>
-                  <button className="ctx-item" onClick={() => run(insertCodeBlock)}><SquareCode size={15} /> Kod bloğu</button>
-                  <button className="ctx-item" onClick={() => run(() => insertText('\n---\n'))}><Minus size={15} /> Yatay çizgi</button>
+                  <button className="ctx-item" onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(insertTable); }}><Table size={15} /> Tablo</button>
+                  <button className="ctx-item" onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(insertCodeBlock); }}><SquareCode size={15} /> Kod bloğu</button>
+                  <button className="ctx-item" onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(() => insertText('\n---\n')); }}><Minus size={15} /> Yatay çizgi</button>
                 </div>
               )}
             </div>
 
             <div className="ctx-sep" />
 
-            <button className="ctx-item" onMouseEnter={() => setOpenSub(null)} onClick={() => run(doCut)}><Scissors size={15} /> Kes</button>
-            <button className="ctx-item" onMouseEnter={() => setOpenSub(null)} onClick={() => run(doCopy)}><Copy size={15} /> Kopyala</button>
-            <button className="ctx-item" onMouseEnter={() => setOpenSub(null)} onClick={() => run(doPaste)}><ClipboardPaste size={15} /> Yapıştır</button>
-            <button className="ctx-item" onMouseEnter={() => setOpenSub(null)} onClick={() => run(doPaste)}><Type size={15} /> Düz metin olarak yapıştır</button>
+            <button className="ctx-item" onMouseEnter={() => setOpenSub(null)} onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(doCut); }}><Scissors size={15} /> Kes</button>
+            <button className="ctx-item" onMouseEnter={() => setOpenSub(null)} onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(doCopy); }}><Copy size={15} /> Kopyala</button>
+            <button className="ctx-item" onMouseEnter={() => setOpenSub(null)} onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(doPaste); }}><ClipboardPaste size={15} /> Yapıştır</button>
+            <button className="ctx-item" onMouseEnter={() => setOpenSub(null)} onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(doPaste); }}><Type size={15} /> Düz metin olarak yapıştır</button>
 
             <div className="ctx-sep" />
 
-            <button className="ctx-item" onMouseEnter={() => setOpenSub(null)} onClick={() => run(selectAll)}><TextSelect size={15} /> Tümünü seç</button>
+            <button className="ctx-item" onMouseEnter={() => setOpenSub(null)} onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); run(selectAll); }}><TextSelect size={15} /> Tümünü seç</button>
           </div>
         </>
       )}
