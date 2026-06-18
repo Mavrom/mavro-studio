@@ -37,92 +37,6 @@ interface DirEntryLite {
   modifiedAt: string | null
 }
 
-const DEFAULT_PROJECTS: Project[] = [
-  {
-    id: '1',
-    name: '🔍 Hangisi Gerçek Medyum?',
-    description: 'HANGİSİ GERÇEK',
-    status: 'production',
-    creator: 'Orkun Işıtmak',
-    platform: 'YouTube',
-    shootDate: '2026-04-27',
-    publishDate: '2026-05-22',
-    viewCount: '6.51K',
-    favorite: true,
-    tags: ['deneme', 'medyum'],
-    links: []
-  },
-  {
-    id: '2',
-    name: '🍳 10 Liralık vs 1000 Liralık Menemen',
-    description: 'FİYAT KARŞILAŞTIRMASI',
-    status: 'published',
-    creator: 'Orkun Işıtmak',
-    platform: 'YouTube',
-    shootDate: '2026-05-10',
-    publishDate: '2026-06-01',
-    viewCount: '1.2M',
-    favorite: true,
-    tags: ['yemek'],
-    links: []
-  },
-  {
-    id: '3',
-    name: '🤫 Gizli Görev: Güvenlikçi Oldum',
-    description: 'GİZLİ GÖREV',
-    status: 'production',
-    creator: 'Orkun Işıtmak',
-    platform: 'YouTube',
-    shootDate: '2026-06-05',
-    publishDate: '2026-06-25',
-    viewCount: '450K',
-    favorite: false,
-    tags: [],
-    links: []
-  },
-  {
-    id: '4',
-    name: '🤖 Yapay Zeka Hayatımı Yönetiyor',
-    description: 'TEKNOLOJİ DENEYLERİ',
-    status: 'draft',
-    creator: 'Orkun Işıtmak',
-    platform: 'YouTube',
-    shootDate: '2026-06-20',
-    publishDate: '2026-07-05',
-    viewCount: '-',
-    favorite: false,
-    tags: ['ai', 'teknoloji'],
-    links: []
-  },
-  {
-    id: '5',
-    name: '📦 Çin\'den Gelen En İlginç Ürünler',
-    description: 'KUTU AÇILIMI',
-    status: 'cancelled',
-    creator: 'Orkun Işıtmak',
-    platform: 'Instagram Reels',
-    shootDate: '2026-04-12',
-    publishDate: '2026-04-15',
-    viewCount: '89K',
-    favorite: false,
-    tags: [],
-    links: []
-  },
-  {
-    id: '6',
-    name: '🏃‍♂️ 24 Saat Boyunca Kaçtım',
-    description: 'KOVALAMACA',
-    status: 'draft',
-    creator: 'Orkun Işıtmak',
-    platform: 'YouTube',
-    shootDate: '',
-    publishDate: '',
-    viewCount: '-',
-    favorite: false,
-    tags: [],
-    links: []
-  }
-]
 
 const COLUMNS: { id: ProjectStatus; labelKey: string; colorClass: string; color: string }[] = [
   { id: 'draft', labelKey: 'projects.draft', colorClass: 'draft', color: '#8b95a5' },
@@ -214,7 +128,7 @@ export default function Projects() {
           setProjects(migrated)
           saveData('projects', migrated)
         } else {
-          setProjects(migrate(DEFAULT_PROJECTS))
+          setProjects([])
         }
       }
       setLoaded(true)
@@ -309,7 +223,7 @@ export default function Projects() {
     setFormName('')
     setFormDescription('')
     setFormStatus('draft')
-    setFormCreator('Orkun Işıtmak')
+    setFormCreator('')
     setFormPlatform('YouTube')
     setFormShootDate('')
     setFormPublishDate('')
@@ -417,7 +331,7 @@ export default function Projects() {
         favorite: false,
         createdAt: new Date().toISOString(),
         ...common,
-        creator: formCreator.trim() || 'Orkun Işıtmak'
+        creator: formCreator.trim()
       }
       setProjects(prev => [newProj, ...prev])
       addToast({ message: t('projects.projectCreated'), type: 'success' })
@@ -983,7 +897,7 @@ export default function Projects() {
                     <div className="form-row">
                       <div className="form-group">
                         <label className="form-label">{t('projects.creator')}</label>
-                        <input type="text" className="input" value={formCreator} onChange={(e) => setFormCreator(e.target.value)} placeholder="Orkun Işıtmak" />
+                        <input type="text" className="input" value={formCreator} onChange={(e) => setFormCreator(e.target.value)} placeholder={t('projects.creator')} />
                       </div>
                       <div className="form-group">
                         <label className="form-label">{t('projects.platform')}</label>

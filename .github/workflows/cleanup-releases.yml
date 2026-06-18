@@ -1,0 +1,42 @@
+name: Cleanup old releases
+
+# Yeni bir sürüm yayınlandığında eski sürümleri (release + tag) otomatik siler.
+# - workflow_run: "Build & Release" tamamlanınca otomatik çalışır (master'da olunca).
+# - workflow_dispatch: elle de tetiklenebilir (mevcut birikmiş sürümleri temizlemek için).
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Build & Release"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    # workflow_run ile tetiklendiyse yalnızca başarılı derlemelerden sonra çalış
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Keep only the latest release, delete the rest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          # En son yayınlanan sürümü koru (published_at'e göre)
+          KEEP_ID=$(gh api "repos/$REPO/releases" --jq 'sort_by(.published_at) | last | .id')
+          echo "En güncel sürüm korunuyor (id=$KEEP_ID)"
+
+          gh api --paginate "repos/$REPO/releases" --jq '.[] | "\(.id)\t\(.tag_name)"' |
+          while IFS=$'\t' read -r id tag; do
+            if [ "$id" != "$KEEP_ID" ]; then
+              echo "Siliniyor: release $id ($tag)"
+              gh api -X DELETE "repos/$REPO/releases/$id"
+              # İlgili tag'i de temizle (yoksa hata vermesin)
+              gh api -X DELETE "repos/$REPO/git/refs/tags/$tag" || true
+            fi
+          done
+
+          echo "Eski sürüm temizliği tamamlandı."

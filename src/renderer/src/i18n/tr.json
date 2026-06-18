@@ -113,7 +113,10 @@
     "createFirst": "İlk notunuzu oluşturmak için butonu kullanın",
     "untitled": "Başlıksız Not",
     "save": "Kaydet",
-    "delete": "Sil"
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "preview": "Önizleme",
+    "contentPlaceholder": "Yazmaya başla… (sağ tıkla biçimlendir)"
   },
   "analytics": {
     "title": "Analitik",

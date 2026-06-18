@@ -113,7 +113,10 @@
     "createFirst": "Click the button to create your first note",
     "untitled": "Untitled Note",
     "save": "Save",
-    "delete": "Delete"
+    "delete": "Delete",
+    "edit": "Edit",
+    "preview": "Preview",
+    "contentPlaceholder": "Start writing… (right-click to format)"
   },
   "analytics": {
     "title": "Analytics",
