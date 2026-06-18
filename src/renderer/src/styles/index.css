@@ -3417,6 +3417,40 @@ tr:hover td {
   color: var(--text-muted);
 }
 
+/* contentEditable (WYSIWYG) editör */
+div.obsidian-editor {
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+div.obsidian-editor:empty::before {
+  content: attr(data-placeholder);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+div.obsidian-editor:focus::before {
+  content: none;
+}
+
+/* Editör içi tablolar */
+.obsidian-editor table.md-table,
+.markdown-content table.md-table,
+.markdown-content table {
+  border-collapse: collapse;
+  margin: var(--space-2) 0;
+}
+
+.obsidian-editor table.md-table th,
+.obsidian-editor table.md-table td,
+.markdown-content table th,
+.markdown-content table td {
+  border: 1px solid var(--border-primary);
+  padding: 4px 10px;
+  text-align: left;
+}
+
 /* =================== SAĞ TIK BİÇİMLENDİRME MENÜSÜ =================== */
 .ctx-backdrop {
   position: fixed;
