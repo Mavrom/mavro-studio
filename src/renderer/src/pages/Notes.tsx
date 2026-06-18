@@ -455,7 +455,6 @@ export default function Notes() {
                 data-placeholder={t('notes.contentPlaceholder') || 'Yazmaya başla… (sağ tıkla biçimlendir)'}
                 onInput={handleInput}
                 onContextMenu={openMenu}
-                onClick={handlePreviewClick}
                 onKeyDown={(e) => {
                   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
                     e.preventDefault()
