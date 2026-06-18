@@ -13,10 +13,7 @@ export default function Security() {
   const { t, addToast } = useAppStore()
   const [showPassMap, setShowPassMap] = useState<Record<string, boolean>>({})
   const [mfaEnabled, setMfaEnabled] = useState(false)
-  const [credentials, setCredentials] = useState<Credential[]>([
-    { id: '1', service: 'GitHub', username: 'mavro-dev', pass: 'ghp_71289AHSJas9120' },
-    { id: '2', service: 'AWS Console', username: 'admin@mavro.io', pass: 'SuperSecretAWS2026!' }
-  ])
+  const [credentials, setCredentials] = useState<Credential[]>([])
 
   const togglePassVisibility = (id: string) => {
     setShowPassMap((prev) => ({ ...prev, [id]: !prev[id] }))
@@ -126,14 +123,7 @@ export default function Security() {
           </h3>
 
           <div className="flex flex-col gap-2">
-            <div className="code-block flex justify-between items-center">
-              <span>Masaüstü uygulaması yetkilendirildi (Win64)</span>
-              <span className="text-sm font-mono text-muted">16.06.2026 03:20</span>
-            </div>
-            <div className="code-block flex justify-between items-center">
-              <span>Şifre deposu anahtarı başarıyla doğrulandı</span>
-              <span className="text-sm font-mono text-muted">16.06.2026 03:00</span>
-            </div>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{t('common.noData')}</p>
           </div>
         </div>
       </div>

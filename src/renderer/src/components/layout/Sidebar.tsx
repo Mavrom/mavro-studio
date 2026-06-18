@@ -117,7 +117,6 @@ export default function Sidebar() {
           page="projects"
           icon={<FolderGit2 />}
           label={t('nav.projects')}
-          badge={3}
         />
         <SidebarItem
           page="notes"

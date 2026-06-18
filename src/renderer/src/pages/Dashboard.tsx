@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAppStore } from '../store'
+import { loadData } from '../lib/cloudData'
+import { supabase } from '../lib/supabase'
 import {
   FolderGit2,
   FileText,
@@ -7,7 +9,6 @@ import {
   Clock,
   Cpu,
   Activity,
-  ArrowRight,
   Plus
 } from 'lucide-react'
 
@@ -19,7 +20,11 @@ interface SystemStats {
 }
 
 export default function Dashboard() {
-  const { t, setActivePage, addToast } = useAppStore()
+  const { t, setActivePage } = useAppStore()
+  const [userEmail, setUserEmail] = useState('')
+  const [projectCount, setProjectCount] = useState<number | null>(null)
+  const [contactCount, setContactCount] = useState<number | null>(null)
+  const [noteCount, setNoteCount] = useState<number | null>(null)
   const [stats, setStats] = useState<SystemStats>({
     cpuUsage: 12,
     memUsage: 45,
@@ -74,8 +79,26 @@ export default function Dashboard() {
     return () => clearInterval(interval)
   }, [])
 
-  const handleAction = (msg: string, page?: string) => {
-    addToast({ message: msg, type: 'info' })
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUserEmail(data.user?.email || '')
+    })
+    Promise.all([
+      loadData('projects'),
+      loadData('contacts'),
+      loadData('notes'),
+    ]).then(([projects, contacts, notes]) => {
+      setProjectCount(projects.length)
+      setContactCount(contacts.length)
+      setNoteCount(notes.length)
+    }).catch(() => {
+      setProjectCount(0)
+      setContactCount(0)
+      setNoteCount(0)
+    })
+  }, [])
+
+  const handleAction = (_msg: string, page?: string) => {
     if (page) setActivePage(page)
   }
 
@@ -97,22 +120,15 @@ export default function Dashboard() {
 
       <div className="page-content flex flex-col gap-6">
         {/* Welcome card */}
-        <div className="card flex items-center justify-between" style={{ background: 'linear-gradient(135deg, rgba(79, 143, 255, 0.1), rgba(167, 139, 250, 0.1))' }}>
+        <div className="card" style={{ background: 'linear-gradient(135deg, rgba(79, 143, 255, 0.1), rgba(167, 139, 250, 0.1))' }}>
           <div>
             <h2 className="card-title" style={{ fontSize: 'var(--font-lg)', marginBottom: '4px' }}>
-              {t('dashboard.welcome')}, Mavro Developer!
+              {t('dashboard.welcome')}{userEmail ? `, ${userEmail}` : ''}
             </h2>
             <p className="card-description">
               {t('dashboard.welcomeMessage')}
             </p>
           </div>
-          <button
-            className="btn btn-secondary btn-sm"
-            onClick={() => handleAction('Explore Tools', 'tools')}
-          >
-            {t('nav.tools')}
-            <ArrowRight size={14} />
-          </button>
         </div>
 
         {/* Stats Grid */}
@@ -122,7 +138,7 @@ export default function Dashboard() {
               <FolderGit2 size={22} />
             </div>
             <div className="stat-info">
-              <span className="stat-value">3</span>
+              <span className="stat-value">{projectCount ?? '—'}</span>
               <span className="stat-label">{t('dashboard.totalProjects')}</span>
             </div>
           </div>
@@ -132,7 +148,7 @@ export default function Dashboard() {
               <Users2 size={22} />
             </div>
             <div className="stat-info">
-              <span className="stat-value">2</span>
+              <span className="stat-value">{contactCount ?? '—'}</span>
               <span className="stat-label">{t('dashboard.totalContacts')}</span>
             </div>
           </div>
@@ -142,7 +158,7 @@ export default function Dashboard() {
               <FileText size={22} />
             </div>
             <div className="stat-info">
-              <span className="stat-value">5</span>
+              <span className="stat-value">{noteCount ?? '—'}</span>
               <span className="stat-label">{t('dashboard.totalNotes')}</span>
             </div>
           </div>

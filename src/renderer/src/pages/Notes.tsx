@@ -430,20 +430,6 @@ export default function Notes() {
                 onChange={(e) => updateTitle(e.target.value)}
                 placeholder={t('notes.untitled')}
               />
-              <div className="notes-editor-actions">
-                <button
-                  className={`notes-toggle-btn ${!isPreview ? 'active' : ''}`}
-                  onClick={() => setIsPreview(false)}
-                >
-                  <FileText size={14} /> {t('notes.edit', 'Düzenle')}
-                </button>
-                <button
-                  className={`notes-toggle-btn ${isPreview ? 'active' : ''}`}
-                  onClick={() => setIsPreview(true)}
-                >
-                  <Check size={14} /> {t('notes.preview', 'Önizleme')}
-                </button>
-              </div>
             </div>
 
             {!isPreview ? (
