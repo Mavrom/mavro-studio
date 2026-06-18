@@ -1,0 +1,106 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  id-token: write          # SignPath OIDC token için gerekli
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Electron app
+        run: npm run build
+
+      - name: Package Windows installer (unsigned)
+        run: npx electron-builder --win --config -p never
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload unsigned artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-windows-installer
+          path: |
+            dist/*.exe
+            dist/*.exe.blockmap
+            dist/latest.yml
+          retention-days: 7
+
+  # ──────────────────────────────────────────────────────────────
+  # SignPath imzalama adımı
+  # SignPath onayı geldikten sonra aşağıdaki bloğun yorumunu kaldırın
+  # ve gerekli secret'ları ekleyin.
+  # ──────────────────────────────────────────────────────────────
+  #
+  # sign-windows:
+  #   needs: build-windows
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Download unsigned artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: unsigned-windows-installer
+  #         path: dist/
+  #
+  #     - name: Sign with SignPath
+  #       uses: signpath/github-action-submit-signing-request@v1
+  #       with:
+  #         api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+  #         organization-id: ${{ secrets.SIGNPATH_ORG_ID }}
+  #         project-slug: 'mavro-studio'
+  #         signing-policy-slug: 'release-signing'
+  #         artifact-configuration-slug: 'windows-installer'
+  #         github-artifact-id: unsigned-windows-installer
+  #         wait-for-completion: true
+  #         output-artifact-directory: dist-signed/
+  #
+  #     - name: Upload signed artifact
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: signed-windows-installer
+  #         path: dist-signed/
+  #         retention-days: 7
+
+  release:
+    needs: build-windows
+    # SignPath aktif edildiğinde yukarıdaki satırı şu şekilde değiştirin:
+    # needs: sign-windows
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: unsigned-windows-installer
+          # SignPath aktif edildiğinde:
+          # name: signed-windows-installer
+          path: dist/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.exe
+            dist/*.exe.blockmap
+            dist/latest.yml
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
