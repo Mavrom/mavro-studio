@@ -64,6 +64,7 @@
       ]
     },
     "nsis": {
+      "artifactName": "Mavro-Studio-Setup-${version}.${ext}",
       "oneClick": true,
       "perMachine": false,
       "deleteAppDataOnUninstall": false,
