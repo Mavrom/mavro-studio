@@ -26,6 +26,8 @@ interface ElectronAPI {
   getLogsPath: () => Promise<string>
   getData: (key: string) => Promise<unknown>
   setData: (key: string, value: unknown) => Promise<boolean>
+  googleLogin: (url: string) => Promise<boolean>
+  onAuthCode: (callback: (code: string) => void) => void
 }
 
 interface PathInfo {

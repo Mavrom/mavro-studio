@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAppStore } from '../store'
+import { loadData, saveData } from '../lib/cloudData'
 import { Search, Plus, Trash2, Edit2, User, Key, Phone, Calendar, Info, Eye, EyeOff } from 'lucide-react'
-import BackButton from '../components/common/BackButton'
 
 interface Contact {
   id: string
@@ -256,25 +256,30 @@ export default function Contacts() {
   const [censorEnabled, setCensorEnabled] = useState(true)
 
   useEffect(() => {
+    const mapItems = (arr: any[]) =>
+      arr.map((item: any) => ({
+        id: item.id || Date.now().toString() + Math.random(),
+        name: item.name || '',
+        username: item.username || item.email?.split('@')[0] || '',
+        customId: item.customId || `ID-${Math.floor(Math.random() * 10000)}`,
+        phone: item.phone || '',
+        birthday: item.birthday || '1995-01-01',
+        info: item.info || item.company || ''
+      }))
     const load = async () => {
-      if (window.api) {
-        const saved = await window.api.getData('contacts') as any[]
-        if (saved && saved.length > 0) {
-          const mapped = saved.map((item: any) => ({
-            id: item.id || Date.now().toString() + Math.random(),
-            name: item.name || '',
-            username: item.username || item.email?.split('@')[0] || '',
-            customId: item.customId || `ID-${Math.floor(Math.random() * 10000)}`,
-            phone: item.phone || '',
-            birthday: item.birthday || '1995-01-01',
-            info: item.info || item.company || ''
-          }))
+      const cloud = await loadData<any>('contacts')
+      if (cloud.length > 0) {
+        setContacts(mapItems(cloud))
+      } else {
+        // Bulut boş — bu cihazdaki eski yerel kişileri taşı (varsa)
+        const local = window.api ? ((await window.api.getData('contacts')) as any[]) : []
+        if (local && local.length > 0) {
+          const mapped = mapItems(local)
           setContacts(mapped)
+          saveData('contacts', mapped)
         } else {
           setContacts(DEFAULT_CONTACTS)
         }
-      } else {
-        setContacts(DEFAULT_CONTACTS)
       }
       setLoaded(true)
     }
@@ -282,9 +287,7 @@ export default function Contacts() {
   }, [])
 
   useEffect(() => {
-    if (loaded && window.api) {
-      window.api.setData('contacts', contacts)
-    }
+    if (loaded) saveData('contacts', contacts)
   }, [contacts, loaded])
 
   const handleSave = (e: React.FormEvent) => {
@@ -361,7 +364,6 @@ export default function Contacts() {
     <div className="animate-fade-in">
       <div className="page-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-          <BackButton />
           <div>
             <h1 className="page-title">{t('contacts.title')}</h1>
             <p className="page-subtitle">{t('contacts.subtitle')}</p>

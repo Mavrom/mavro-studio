@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useAppStore } from '../store'
-import BackButton from '../components/common/BackButton'
 import {
   SlidersHorizontal,
   User,
@@ -147,7 +146,6 @@ export default function Settings() {
       {/* Page header */}
       <div className="page-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-          <BackButton />
           <h1 className="page-title">{t('settings.title')}</h1>
         </div>
         <button className="btn btn-primary" onClick={handleSave}>

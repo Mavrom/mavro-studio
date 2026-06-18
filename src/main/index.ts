@@ -212,6 +212,55 @@ ipcMain.handle('appdata:set', (_event, key: string, value: unknown) => {
   return true
 })
 
+// Google OAuth — masaüstü loopback akışı
+// Renderer Supabase'den giriş URL'sini üretir, burada loopback sunucusunu açıp
+// tarayıcıyı başlatırız; Google geri dönünce 'code'u renderer'a iletiriz.
+let authServer: import('http').Server | null = null
+
+ipcMain.handle('auth:google-login', async (_event, url: string) => {
+  const http = await import('http')
+  if (authServer) {
+    authServer.close()
+    authServer = null
+  }
+  authServer = http.createServer((req, res) => {
+    try {
+      const reqUrl = new URL(req.url || '', 'http://localhost:8788')
+      if (reqUrl.pathname !== '/callback') {
+        res.writeHead(404)
+        res.end()
+        return
+      }
+      const code = reqUrl.searchParams.get('code')
+      const errDesc =
+        reqUrl.searchParams.get('error_description') || reqUrl.searchParams.get('error')
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
+      res.end(
+        `<!doctype html><html><head><meta charset="utf-8"><title>Mavro Studio</title></head>` +
+          `<body style="font-family:system-ui;background:#0d1117;color:#e8edf5;display:flex;align-items:center;justify-content:center;height:100vh;margin:0">` +
+          `<div style="text-align:center"><h2>${code ? 'Giriş başarılı ✓' : 'Giriş başarısız'}</h2>` +
+          `<p>${code ? "Bu pencereyi kapatıp Mavro Studio'ya dönebilirsiniz." : (errDesc || 'Bilinmeyen hata')}</p></div>` +
+          `</body></html>`
+      )
+      if (code) {
+        mainWindow?.webContents.send('auth:code', code)
+        if (mainWindow) {
+          if (mainWindow.isMinimized()) mainWindow.restore()
+          mainWindow.focus()
+        }
+      }
+      authServer?.close()
+      authServer = null
+    } catch {
+      res.writeHead(500)
+      res.end()
+    }
+  })
+  authServer.listen(8788)
+  await shell.openExternal(url)
+  return true
+})
+
 // File system info (project folders)
 ipcMain.handle('fs:pathInfo', async (_event, targetPath: string) => {
   if (!targetPath) return { exists: false, name: '', path: targetPath, isDirectory: false, size: 0, createdAt: null, modifiedAt: null }

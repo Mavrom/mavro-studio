@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react'
+import type { Session } from '@supabase/supabase-js'
 import { useAppStore } from './store'
+import { supabase } from './lib/supabase'
 import TitleBar from './components/layout/TitleBar'
 import Sidebar from './components/layout/Sidebar'
 import StatusBar from './components/layout/StatusBar'
 import ToastContainer from './components/common/ToastContainer'
 import UpdateModal from './components/common/UpdateModal'
+import LoginScreen from './components/auth/LoginScreen'
+import { Loader2 } from 'lucide-react'
 import HomePage from './pages/HomePage'
 import Dashboard from './pages/Dashboard'
 import Projects from './pages/Projects'
@@ -13,12 +17,36 @@ import Contacts from './pages/Contacts'
 import Settings from './pages/Settings'
 
 function App() {
-  const { activePage, setTheme, setLanguage, setActivePage } = useAppStore()
+  const { activePage, setTheme, setLanguage } = useAppStore()
 
   const [updateInfo, setUpdateInfo] = useState<{ version: string } | null>(null)
   const [updateDownloading, setUpdateDownloading] = useState(false)
   const [updateProgress, setUpdateProgress] = useState<number | null>(null)
   const [updateDownloaded, setUpdateDownloaded] = useState(false)
+
+  const [session, setSession] = useState<Session | null>(null)
+  const [authLoading, setAuthLoading] = useState(true)
+
+  // Oturumu yükle + değişiklikleri dinle
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session)
+      setAuthLoading(false)
+    })
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s)
+    })
+    return () => sub.subscription.unsubscribe()
+  }, [])
+
+  // Tarayıcıdan dönen OAuth kodunu oturuma çevir
+  useEffect(() => {
+    window.api?.onAuthCode(async (code: string) => {
+      const { error } = await supabase.auth.exchangeCodeForSession(code)
+      if (error) console.error('exchangeCodeForSession', error.message)
+    })
+  }, [])
+
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -71,13 +99,35 @@ function App() {
     }
   }
 
-  const showSidebar = activePage === 'dashboard' || activePage === 'home'
+  // Oturum kontrol edilirken kısa yükleme
+  if (authLoading) {
+    return (
+      <>
+        <TitleBar />
+        <div className="auth-loading">
+          <Loader2 size={28} className="login-spin" />
+        </div>
+        <StatusBar />
+      </>
+    )
+  }
+
+  // Giriş zorunlu: oturum yoksa giriş ekranı
+  if (!session) {
+    return (
+      <>
+        <TitleBar />
+        <LoginScreen />
+        <ToastContainer />
+      </>
+    )
+  }
 
   return (
     <>
       <TitleBar />
       <div className="app-container">
-        {showSidebar && <Sidebar />}
+        <Sidebar />
         <main className="main-content">
           {renderPage()}
         </main>
