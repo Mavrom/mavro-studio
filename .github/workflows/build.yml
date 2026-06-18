@@ -4,12 +4,6 @@ on:
   push:
     tags:
       - 'v*'
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Release tag to rebuild (e.g. v1.2.9)'
-        required: true
-        default: 'v1.2.9'
 
 permissions:
   contents: write
@@ -21,8 +15,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.tag || github.ref }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -103,7 +95,6 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
           files: |
             dist/*.exe
             dist/*.exe.blockmap
