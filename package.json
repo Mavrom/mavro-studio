@@ -1,6 +1,6 @@
 {
   "name": "mavro-studio",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Mavro Studio - Professional Desktop Toolkit",
   "main": "./out/main/index.js",
   "author": "Mavro Team",
