@@ -38,6 +38,9 @@ const api = {
   onUpdateDownloaded: (callback: () => void) => {
     ipcRenderer.on('updater:update-downloaded', () => callback())
   },
+  onUpdateError: (callback: (error: string) => void) => {
+    ipcRenderer.on('updater:error', (_event, error) => callback(error))
+  },
 
   // File system
   pathInfo: (path: string) => ipcRenderer.invoke('fs:pathInfo', path),

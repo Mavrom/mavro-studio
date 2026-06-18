@@ -18,6 +18,7 @@ interface ElectronAPI {
   onUpdateAvailable: (callback: (info: unknown) => void) => void
   onDownloadProgress: (callback: (progress: unknown) => void) => void
   onUpdateDownloaded: (callback: () => void) => void
+  onUpdateError: (callback: (error: string) => void) => void
   pathInfo: (path: string) => Promise<PathInfo>
   readDir: (path: string) => Promise<DirEntry[] | null>
   openPath: (path: string) => Promise<string>

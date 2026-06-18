@@ -17,7 +17,7 @@ import Contacts from './pages/Contacts'
 import Settings from './pages/Settings'
 
 function App() {
-  const { activePage, setTheme, setLanguage } = useAppStore()
+  const { activePage, setTheme, setLanguage, addToast } = useAppStore()
 
   const [updateInfo, setUpdateInfo] = useState<{ version: string } | null>(null)
   const [updateDownloading, setUpdateDownloading] = useState(false)
@@ -79,6 +79,12 @@ function App() {
     window.api.onUpdateDownloaded(() => {
       setUpdateDownloaded(true)
       setUpdateDownloading(false)
+    })
+    window.api.onUpdateError((errorMsg: string) => {
+      console.error('Update failed:', errorMsg)
+      addToast({ message: `Güncelleme başarısız: ${errorMsg}`, type: 'error' })
+      setUpdateDownloading(false)
+      setUpdateProgress(null)
     })
   }, [])
 

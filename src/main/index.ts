@@ -356,6 +356,7 @@ app.whenReady().then(() => {
 
     autoUpdater.on('error', (err) => {
       console.error('AutoUpdater error:', err)
+      mainWindow?.webContents.send('updater:error', err?.message || String(err))
     })
 
     autoUpdater.on('update-available', (info) => {
