@@ -29,11 +29,21 @@ function App() {
 
   // Oturumu yükle + değişiklikleri dinle
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (data.session?.user?.id) {
+        await window.api?.setUserSession(data.session.user.id)
+      } else {
+        await window.api?.setUserSession(null)
+      }
       setSession(data.session)
       setAuthLoading(false)
     })
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
+    const { data: sub } = supabase.auth.onAuthStateChange(async (_event, s) => {
+      if (s?.user?.id) {
+        await window.api?.setUserSession(s.user.id)
+      } else {
+        await window.api?.setUserSession(null)
+      }
       setSession(s)
     })
     return () => sub.subscription.unsubscribe()
@@ -64,7 +74,7 @@ function App() {
       }
     }
     loadSettings()
-  }, [])
+  }, [session])
 
   useEffect(() => {
     if (!window.api) return

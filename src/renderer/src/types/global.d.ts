@@ -29,6 +29,7 @@ interface ElectronAPI {
   setData: (key: string, value: unknown) => Promise<boolean>
   googleLogin: (url: string) => Promise<boolean>
   onAuthCode: (callback: (code: string) => void) => void
+  setUserSession: (userId: string | null) => Promise<boolean>
 }
 
 interface PathInfo {

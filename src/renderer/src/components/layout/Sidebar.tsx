@@ -82,6 +82,7 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     setShowProfileMenu(false)
+    setActivePage('home')
     await supabase.auth.signOut()
   }
 

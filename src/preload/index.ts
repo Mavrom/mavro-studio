@@ -62,7 +62,10 @@ const api = {
   googleLogin: (url: string) => ipcRenderer.invoke('auth:google-login', url),
   onAuthCode: (callback: (code: string) => void) => {
     ipcRenderer.on('auth:code', (_event, code) => callback(code))
-  }
+  },
+
+  // Set active user session
+  setUserSession: (userId: string | null) => ipcRenderer.invoke('auth:set-session', userId)
 }
 
 // Expose API to renderer

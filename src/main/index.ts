@@ -5,50 +5,77 @@ import { autoUpdater } from 'electron-updater'
 import Store from 'electron-store'
 import * as os from 'os'
 
-// Config store for persistent settings
-const store = new Store({
+let activeUserId: string | null = null
+
+const settingsStoreCache = new Map<string, Store>()
+const dataStoreCache = new Map<string, Store>()
+
+// Global store for things like window bounds and auto updater config
+const globalStore = new Store({
+  name: 'global_config',
   defaults: {
-    language: 'tr',
-    theme: 'dark',
-    autoStart: false,
-    defaultExportPath: '',
-    dataDirectory: join(app.getPath('userData'), 'data'),
-    mavroPath: '',
-    idePath: '',
-    startupParams: '',
-    proxy: {
-      enabled: false,
-      type: 'http',
-      host: '',
-      port: '',
-      username: '',
-      password: '',
-      bypass: ''
-    },
-    notifications: {
-      enabled: true,
-      sound: true
-    },
-    autoUpdate: true,
-    logLevel: 'info',
-    windowBounds: { width: 1280, height: 800 }
+    windowBounds: { width: 1280, height: 800 },
+    autoUpdate: true
   }
 })
 
-// App data store for user-created content (projects, notes, contacts)
-const dataStore = new Store({
-  name: 'appdata',
-  defaults: {
-    projects: [],
-    notes: [],
-    contacts: []
+function getSettingsStore(): Store {
+  const key = activeUserId || 'guest'
+  if (!settingsStoreCache.has(key)) {
+    const name = activeUserId ? `settings_${activeUserId}` : 'guest_settings'
+    settingsStoreCache.set(key, new Store({
+      name,
+      defaults: {
+        language: 'tr',
+        theme: 'dark',
+        autoStart: false,
+        defaultExportPath: '',
+        dataDirectory: join(app.getPath('userData'), 'data'),
+        mavroPath: '',
+        idePath: '',
+        startupParams: '',
+        proxy: {
+          enabled: false,
+          type: 'http',
+          host: '',
+          port: '',
+          username: '',
+          password: '',
+          bypass: ''
+        },
+        notifications: {
+          enabled: true,
+          sound: true
+        },
+        autoUpdate: true,
+        logLevel: 'info',
+        windowBounds: { width: 1280, height: 800 }
+      }
+    }))
   }
-})
+  return settingsStoreCache.get(key)!
+}
+
+function getDataStore(): Store {
+  const key = activeUserId || 'guest'
+  if (!dataStoreCache.has(key)) {
+    const name = activeUserId ? `appdata_${activeUserId}` : 'guest_appdata'
+    dataStoreCache.set(key, new Store({
+      name,
+      defaults: {
+        projects: [],
+        notes: [],
+        contacts: []
+      }
+    }))
+  }
+  return dataStoreCache.get(key)!
+}
 
 let mainWindow: BrowserWindow | null = null
 
 function createWindow(): void {
-  const bounds = store.get('windowBounds') as { width: number; height: number }
+  const bounds = globalStore.get('windowBounds') as { width: number; height: number } || { width: 1280, height: 800 }
 
   mainWindow = new BrowserWindow({
     width: bounds.width || 1280,
@@ -76,7 +103,7 @@ function createWindow(): void {
   mainWindow.on('resize', () => {
     if (mainWindow) {
       const [width, height] = mainWindow.getSize()
-      store.set('windowBounds', { width, height })
+      globalStore.set('windowBounds', { width, height })
     }
   })
 
@@ -108,25 +135,25 @@ ipcMain.handle('window:isMaximized', () => mainWindow?.isMaximized())
 
 // Settings IPC
 ipcMain.handle('settings:get', (_event, key: string) => {
-  return store.get(key)
+  return getSettingsStore().get(key)
 })
 
 ipcMain.handle('settings:set', (_event, key: string, value: unknown) => {
-  store.set(key, value)
+  getSettingsStore().set(key, value)
   return true
 })
 
 ipcMain.handle('settings:getAll', () => {
-  return store.store
+  return getSettingsStore().store
 })
 
 // Theme
 ipcMain.handle('theme:get', () => {
-  return store.get('theme')
+  return getSettingsStore().get('theme')
 })
 
 ipcMain.handle('theme:set', (_event, theme: string) => {
-  store.set('theme', theme)
+  getSettingsStore().set('theme', theme)
   if (theme === 'system') {
     nativeTheme.themeSource = 'system'
   } else {
@@ -204,11 +231,11 @@ ipcMain.handle('updater:install', () => {
 
 // App data (projects, notes, contacts)
 ipcMain.handle('appdata:get', (_event, key: string) => {
-  return dataStore.get(key)
+  return getDataStore().get(key)
 })
 
 ipcMain.handle('appdata:set', (_event, key: string, value: unknown) => {
-  dataStore.set(key, value)
+  getDataStore().set(key, value)
   return true
 })
 
@@ -258,6 +285,12 @@ ipcMain.handle('auth:google-login', async (_event, url: string) => {
   })
   authServer.listen(8788)
   await shell.openExternal(url)
+  return true
+})
+
+// Set active user session to isolate local config/data
+ipcMain.handle('auth:set-session', (_event, userId: string | null) => {
+  activeUserId = userId
   return true
 })
 
@@ -377,7 +410,7 @@ app.whenReady().then(() => {
     })
 
     // Check for updates after window is ready (with small delay to ensure network is ready)
-    if (store.get('autoUpdate')) {
+    if (globalStore.get('autoUpdate')) {
       setTimeout(() => {
         autoUpdater.checkForUpdates().catch(err => {
           console.error('Startup update check failed:', err)
