@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useAppStore } from '../store'
+import { loadData, saveData } from '../lib/cloudData'
 import {
   Search, Plus, Star, Edit, Trash2, Eye, X, ChevronLeft, ChevronRight,
   Folder, FolderOpen, File as FileIcon, ExternalLink, Link2, Hash, Calendar, Clock,
   LayoutGrid
 } from 'lucide-react'
-import BackButton from '../components/common/BackButton'
 
 export type ProjectStatus = 'draft' | 'production' | 'published' | 'cancelled'
 
@@ -203,11 +203,19 @@ export default function Projects() {
         status: (VALID_STATUSES.includes(p.status) ? p.status : 'production') as ProjectStatus
       }))
     const load = async () => {
-      if (window.api) {
-        const saved = await window.api.getData('projects') as Project[]
-        setProjects(migrate(saved && saved.length > 0 ? saved : DEFAULT_PROJECTS))
+      const cloud = await loadData<Project>('projects')
+      if (cloud.length > 0) {
+        setProjects(migrate(cloud))
       } else {
-        setProjects(migrate(DEFAULT_PROJECTS))
+        // Bulut boş — bu cihazdaki eski yerel projeleri taşı (varsa)
+        const local = window.api ? ((await window.api.getData('projects')) as Project[]) : []
+        if (local && local.length > 0) {
+          const migrated = migrate(local)
+          setProjects(migrated)
+          saveData('projects', migrated)
+        } else {
+          setProjects(migrate(DEFAULT_PROJECTS))
+        }
       }
       setLoaded(true)
     }
@@ -215,9 +223,7 @@ export default function Projects() {
   }, [])
 
   useEffect(() => {
-    if (loaded && window.api) {
-      window.api.setData('projects', projects)
-    }
+    if (loaded) saveData('projects', projects)
   }, [projects, loaded])
 
   const detailProject = projects.find(p => p.id === detailId) || null
@@ -473,8 +479,8 @@ export default function Projects() {
       <div className="project-detail animate-fade-in" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         <div className="page-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', minWidth: 0 }}>
-            <button className="btn btn-secondary btn-sm" onClick={() => setDetailId(null)}>
-              <ChevronLeft size={15} /> {t('common.back')}
+            <button className="btn btn-secondary btn-sm btn-icon" onClick={() => setDetailId(null)} title={t('common.close') || 'Kapat'}>
+              <X size={15} />
             </button>
             <div style={{ minWidth: 0 }}>
               <h1 className="page-title" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</h1>
@@ -628,7 +634,6 @@ export default function Projects() {
     <>
       <div className="page-header page-header-hero">
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-          <BackButton />
           <div className="page-header-icon">
             <LayoutGrid size={22} />
           </div>
@@ -824,8 +829,16 @@ export default function Projects() {
   )
 
   return (
-    <div className="animate-fade-in" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {detailProject ? renderDetail(detailProject) : renderBoard()}
+    <div className={`animate-fade-in projects-layout ${detailProject ? 'has-detail' : ''}`} style={{ height: '100%', display: 'flex' }}>
+      <div className="projects-main" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
+        {renderBoard()}
+      </div>
+
+      {detailProject && (
+        <aside className="project-detail-panel">
+          {renderDetail(detailProject)}
+        </aside>
+      )}
 
       {/* Add & Edit Modal */}
       {showModal && (

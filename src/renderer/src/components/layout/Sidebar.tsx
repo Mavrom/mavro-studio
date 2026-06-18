@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useAppStore } from '../../store'
+import { supabase } from '../../lib/supabase'
 import {
   Home,
   LayoutDashboard,
@@ -7,6 +8,7 @@ import {
   FileText,
   Users2,
   Settings,
+  LogOut,
   ChevronRight,
   ChevronsLeft,
   ChevronDown
@@ -42,6 +44,7 @@ export default function Sidebar() {
   const { t, sidebarCollapsed, toggleSidebar, setActivePage } = useAppStore()
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [appVersion, setAppVersion] = useState('1.1.8')
+  const [userEmail, setUserEmail] = useState('')
   const profileMenuRef = useRef<HTMLDivElement>(null)
 
   // Close profile menu on outside click
@@ -71,6 +74,17 @@ export default function Sidebar() {
     loadVersion()
   }, [])
 
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUserEmail(data.user?.email || '')
+    })
+  }, [])
+
+  const handleLogout = async () => {
+    setShowProfileMenu(false)
+    await supabase.auth.signOut()
+  }
+
   return (
     <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
       <div className="sidebar-header">
@@ -88,14 +102,11 @@ export default function Sidebar() {
       </div>
 
       <nav className="sidebar-nav">
-        <div className="sidebar-section-title">{t('sections.home')}</div>
         <SidebarItem
           page="home"
           icon={<Home />}
           label={t('nav.home')}
         />
-
-        <div className="sidebar-section-title">{t('sections.main')}</div>
         <SidebarItem
           page="dashboard"
           icon={<LayoutDashboard />}
@@ -107,8 +118,6 @@ export default function Sidebar() {
           label={t('nav.projects')}
           badge={3}
         />
-
-        <div className="sidebar-section-title">{t('sections.workspace')}</div>
         <SidebarItem
           page="notes"
           icon={<FileText />}
@@ -134,6 +143,9 @@ export default function Sidebar() {
         {/* Profile Popup Menu */}
         {showProfileMenu && (
           <div className="profile-popup-menu animate-fade-in">
+            {userEmail && (
+              <div className="profile-popup-email" title={userEmail}>{userEmail}</div>
+            )}
             <div
               className="profile-popup-item"
               onClick={() => {
@@ -143,6 +155,10 @@ export default function Sidebar() {
             >
               <Settings size={15} />
               <span>{t('profile.settings')}</span>
+            </div>
+            <div className="profile-popup-item danger" onClick={handleLogout}>
+              <LogOut size={15} />
+              <span>Çıkış yap</span>
             </div>
           </div>
         )}

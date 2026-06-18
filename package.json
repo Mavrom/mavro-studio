@@ -21,6 +21,7 @@
     "build:linux": "npm run build && electron-builder --linux --config"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.108.2",
     "electron-store": "^8.2.0",
     "electron-updater": "^6.3.9",
     "lucide-react": "^0.511.0",

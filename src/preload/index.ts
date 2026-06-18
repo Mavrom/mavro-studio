@@ -53,7 +53,13 @@ const api = {
 
   // App data (projects, notes, contacts)
   getData: (key: string) => ipcRenderer.invoke('appdata:get', key),
-  setData: (key: string, value: unknown) => ipcRenderer.invoke('appdata:set', key, value)
+  setData: (key: string, value: unknown) => ipcRenderer.invoke('appdata:set', key, value),
+
+  // Google OAuth (masaüstü loopback)
+  googleLogin: (url: string) => ipcRenderer.invoke('auth:google-login', url),
+  onAuthCode: (callback: (code: string) => void) => {
+    ipcRenderer.on('auth:code', (_event, code) => callback(code))
+  }
 }
 
 // Expose API to renderer
