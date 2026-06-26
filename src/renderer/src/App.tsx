@@ -20,7 +20,7 @@ import Tools from './pages/Tools'
 import Settings from './pages/Settings'
 
 function App() {
-  const { activePage, setActivePage, toggleSidebar, setTheme, setLanguage, addToast } = useAppStore()
+  const { activePage, setActivePage, toggleSidebar, setTheme, setLanguage, addToast, addNotification } = useAppStore()
 
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
@@ -86,7 +86,14 @@ function App() {
     if (!window.api) return
     window.api.onUpdateAvailable((info: unknown) => {
       const data = info as { version: string }
-      if (data?.version) setUpdateInfo(data)
+      if (data?.version) {
+        setUpdateInfo(data)
+        addNotification({
+          title: 'Güncelleme mevcut',
+          message: `Yeni sürüm hazır: v${data.version}`,
+          type: 'info'
+        })
+      }
     })
     window.api.onDownloadProgress((progress: unknown) => {
       const p = progress as { percent: number }

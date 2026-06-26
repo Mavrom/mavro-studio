@@ -401,6 +401,13 @@
     "version": "v1.0.0",
     "connected": "Connected"
   },
+  "notif": {
+    "title": "Notifications",
+    "empty": "No notifications yet",
+    "clear": "Clear",
+    "markAll": "Mark all as read",
+    "remove": "Remove"
+  },
   "cmd": {
     "placeholder": "Search commands or pages...",
     "goto": "Go to page",

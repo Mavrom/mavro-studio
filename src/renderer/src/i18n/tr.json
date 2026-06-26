@@ -402,6 +402,13 @@
     "version": "v1.0.0",
     "connected": "Bağlı"
   },
+  "notif": {
+    "title": "Bildirimler",
+    "empty": "Henüz bildirim yok",
+    "clear": "Temizle",
+    "markAll": "Tümünü okundu işaretle",
+    "remove": "Kaldır"
+  },
   "cmd": {
     "placeholder": "Komut veya sayfa ara...",
     "goto": "Sayfaya git",

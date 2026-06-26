@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAppStore } from '../../store'
 import { Minus, Square, X, Copy } from 'lucide-react'
+import NotificationCenter from '../common/NotificationCenter'
 
 export default function TitleBar() {
   const { t } = useAppStore()
@@ -30,6 +31,7 @@ export default function TitleBar() {
         <span>{t('app.name')}</span>
       </div>
       <div className="titlebar-controls">
+        <NotificationCenter />
         <button className="titlebar-btn" onClick={handleMinimize} title="Minimize">
           <Minus size={16} />
         </button>

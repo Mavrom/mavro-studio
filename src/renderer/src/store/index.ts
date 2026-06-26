@@ -24,8 +24,11 @@ interface AppState {
 
   // Notifications
   notifications: Notification[]
-  addNotification: (notification: Omit<Notification, 'id' | 'timestamp'>) => void
+  addNotification: (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => void
   removeNotification: (id: string) => void
+  markNotificationRead: (id: string) => void
+  markAllNotificationsRead: () => void
+  clearNotifications: () => void
 
   // Toast
   toasts: Toast[]
@@ -109,6 +112,15 @@ export const useAppStore = create<AppState>((set, get) => ({
     set((state) => ({
       notifications: state.notifications.filter((n) => n.id !== id)
     })),
+  markNotificationRead: (id) =>
+    set((state) => ({
+      notifications: state.notifications.map((n) => (n.id === id ? { ...n, read: true } : n))
+    })),
+  markAllNotificationsRead: () =>
+    set((state) => ({
+      notifications: state.notifications.map((n) => ({ ...n, read: true }))
+    })),
+  clearNotifications: () => set({ notifications: [] }),
 
   // Toast
   toasts: [],
