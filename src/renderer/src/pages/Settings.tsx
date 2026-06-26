@@ -82,7 +82,7 @@ export default function Settings() {
         if (p.host) setProxyHost(p.host as string)
         if (p.port) setProxyPort(p.port as string)
       }
-      setSysInfo(info as Record<string, string>)
+      setSysInfo(info as unknown as Record<string, string>)
     }).catch(console.error)
   }, [])
 

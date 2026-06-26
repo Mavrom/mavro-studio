@@ -14,6 +14,7 @@ import Dashboard from './pages/Dashboard'
 import Projects from './pages/Projects'
 import Notes from './pages/Notes'
 import Contacts from './pages/Contacts'
+import Tools from './pages/Tools'
 import Settings from './pages/Settings'
 
 function App() {
@@ -110,6 +111,7 @@ function App() {
       case 'projects': return <Projects />
       case 'notes': return <Notes />
       case 'contacts': return <Contacts />
+      case 'tools': return <Tools />
       case 'settings': return <Settings />
       default: return <HomePage />
     }
