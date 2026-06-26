@@ -381,5 +381,22 @@
     "ready": "Hazır",
     "version": "v1.0.0",
     "connected": "Bağlı"
+  },
+  "cmd": {
+    "placeholder": "Komut veya sayfa ara...",
+    "goto": "Sayfaya git",
+    "action": "İşlem",
+    "toggleSidebar": "Kenar çubuğunu aç/kapat",
+    "toggleLanguage": "Dili değiştir (TR/EN)",
+    "shortcuts": "Klavye kısayolları"
+  },
+  "shortcuts": {
+    "title": "Klavye Kısayolları",
+    "general": "Genel",
+    "navigation": "Gezinme",
+    "palette": "Komut paletini aç",
+    "sidebar": "Kenar çubuğunu aç/kapat",
+    "help": "Bu pencereyi aç",
+    "close": "Pencereyi kapat"
   }
 }

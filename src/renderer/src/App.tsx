@@ -7,6 +7,8 @@ import Sidebar from './components/layout/Sidebar'
 import StatusBar from './components/layout/StatusBar'
 import ToastContainer from './components/common/ToastContainer'
 import UpdateModal from './components/common/UpdateModal'
+import CommandPalette from './components/common/CommandPalette'
+import ShortcutsHelp from './components/common/ShortcutsHelp'
 import LoginScreen from './components/auth/LoginScreen'
 import { Loader2 } from 'lucide-react'
 import HomePage from './pages/HomePage'
@@ -18,7 +20,10 @@ import Tools from './pages/Tools'
 import Settings from './pages/Settings'
 
 function App() {
-  const { activePage, setTheme, setLanguage, addToast } = useAppStore()
+  const { activePage, setActivePage, toggleSidebar, setTheme, setLanguage, addToast } = useAppStore()
+
+  const [paletteOpen, setPaletteOpen] = useState(false)
+  const [helpOpen, setHelpOpen] = useState(false)
 
   const [updateInfo, setUpdateInfo] = useState<{ version: string } | null>(null)
   const [updateDownloading, setUpdateDownloading] = useState(false)
@@ -104,6 +109,43 @@ function App() {
     window.api?.downloadUpdate()
   }
 
+  // Global klavye kısayolları
+  useEffect(() => {
+    const PAGES = ['home', 'dashboard', 'projects', 'notes', 'contacts', 'tools', 'settings']
+    const handler = (e: KeyboardEvent) => {
+      const mod = e.ctrlKey || e.metaKey
+      const target = e.target as HTMLElement | null
+      const typing = !!target && (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT' ||
+        target.isContentEditable
+      )
+
+      if (mod && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setPaletteOpen(o => !o)
+        return
+      }
+      if (mod && e.key.toLowerCase() === 'b') {
+        e.preventDefault()
+        toggleSidebar()
+        return
+      }
+      if (mod && /^[1-7]$/.test(e.key)) {
+        e.preventDefault()
+        setActivePage(PAGES[Number(e.key) - 1])
+        return
+      }
+      if (!mod && !typing && (e.key === '?' || (e.shiftKey && e.key === '/'))) {
+        e.preventDefault()
+        setHelpOpen(o => !o)
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [setActivePage, toggleSidebar])
+
   const renderPage = () => {
     switch (activePage) {
       case 'home': return <HomePage />
@@ -152,6 +194,12 @@ function App() {
       </div>
       <StatusBar />
       <ToastContainer />
+      <CommandPalette
+        open={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+        onOpenHelp={() => setHelpOpen(true)}
+      />
+      <ShortcutsHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
       {updateInfo && (
         <UpdateModal
           version={updateInfo.version}

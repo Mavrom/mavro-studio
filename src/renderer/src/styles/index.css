@@ -4058,3 +4058,93 @@ div.obsidian-editor:focus::before {
   font-family: var(--font-mono);
 }
 .tool-stat-label { font-size: var(--font-xs); color: var(--text-muted); }
+
+/* ============================================================
+   KOMUT PALETİ (Ctrl+K) & KISAYOLLAR
+   ============================================================ */
+.cmd-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12vh;
+}
+.cmd-palette {
+  width: min(620px, 92vw);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 70vh;
+}
+.cmd-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border-primary);
+  color: var(--text-muted);
+}
+.cmd-search input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: var(--font-lg);
+}
+.cmd-kbd {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  color: var(--text-muted);
+}
+.cmd-list { overflow-y: auto; padding: var(--space-2); }
+.cmd-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+  color: var(--text-secondary);
+}
+.cmd-item.active { background: var(--bg-active); color: var(--text-primary); }
+.cmd-item-icon { display: flex; color: var(--accent-primary); }
+.cmd-item-label { font-size: var(--font-base); font-weight: 500; }
+.cmd-item-hint { margin-left: auto; font-size: var(--font-xs); color: var(--text-muted); }
+.cmd-item-arrow { color: var(--text-muted); opacity: 0; transition: opacity 0.12s; }
+.cmd-item.active .cmd-item-arrow { opacity: 1; }
+.cmd-empty { padding: var(--space-6); text-align: center; color: var(--text-muted); }
+
+.shortcuts-group-title {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-3);
+}
+.shortcuts-list { display: flex; flex-direction: column; gap: 4px; }
+.shortcuts-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 4px;
+}
+.shortcuts-desc { font-size: var(--font-sm); color: var(--text-secondary); }
+.shortcuts-keys { display: flex; gap: 4px; }

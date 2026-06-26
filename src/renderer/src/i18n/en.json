@@ -381,5 +381,22 @@
     "ready": "Ready",
     "version": "v1.0.0",
     "connected": "Connected"
+  },
+  "cmd": {
+    "placeholder": "Search commands or pages...",
+    "goto": "Go to page",
+    "action": "Action",
+    "toggleSidebar": "Toggle sidebar",
+    "toggleLanguage": "Switch language (TR/EN)",
+    "shortcuts": "Keyboard shortcuts"
+  },
+  "shortcuts": {
+    "title": "Keyboard Shortcuts",
+    "general": "General",
+    "navigation": "Navigation",
+    "palette": "Open command palette",
+    "sidebar": "Toggle sidebar",
+    "help": "Open this dialog",
+    "close": "Close dialog"
   }
 }
