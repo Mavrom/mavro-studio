@@ -254,7 +254,13 @@
     "selectDate": "Tarih seçin",
     "censorOn": "Sansür Modu: Açık",
     "censorOff": "Sansür Modu: Kapalı",
-    "unnamed": "İsimsiz"
+    "unnamed": "İsimsiz",
+    "sort": "Sırala",
+    "copy": "Kopyalamak için tıkla",
+    "exported": "Kişiler dışa aktarıldı",
+    "upcomingBirthdays": "Yaklaşan doğum günleri",
+    "today": "bugün",
+    "daysLeft": "gün kaldı"
   },
   "security": {
     "title": "Güvenlik",

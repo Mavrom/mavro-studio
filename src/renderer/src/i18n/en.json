@@ -254,7 +254,13 @@
     "selectDate": "Select date",
     "censorOn": "Censor Mode: On",
     "censorOff": "Censor Mode: Off",
-    "unnamed": "Unnamed"
+    "unnamed": "Unnamed",
+    "sort": "Sort",
+    "copy": "Click to copy",
+    "exported": "Contacts exported",
+    "upcomingBirthdays": "Upcoming birthdays",
+    "today": "today",
+    "daysLeft": "days left"
   },
   "security": {
     "title": "Security",
