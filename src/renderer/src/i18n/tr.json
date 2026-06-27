@@ -129,7 +129,17 @@
     "delete": "Sil",
     "edit": "Düzenle",
     "preview": "Önizleme",
-    "contentPlaceholder": "Yazmaya başla… (sağ tıkla biçimlendir)"
+    "contentPlaceholder": "Yazmaya başla… (sağ tıkla biçimlendir)",
+    "pin": "Sabitle",
+    "unpin": "Sabitlemeyi kaldır",
+    "markSnippet": "Snippet olarak işaretle",
+    "duplicate": "Çoğalt",
+    "export": "Dışa aktar",
+    "exported": "Not dışa aktarıldı",
+    "sort": "Sırala",
+    "sort_default": "Varsayılan",
+    "sort_titleAsc": "Başlık A→Z",
+    "sort_titleDesc": "Başlık Z→A"
   },
   "analytics": {
     "title": "Analitik",

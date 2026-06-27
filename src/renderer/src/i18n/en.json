@@ -129,7 +129,17 @@
     "delete": "Delete",
     "edit": "Edit",
     "preview": "Preview",
-    "contentPlaceholder": "Start writing… (right-click to format)"
+    "contentPlaceholder": "Start writing… (right-click to format)",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "markSnippet": "Mark as snippet",
+    "duplicate": "Duplicate",
+    "export": "Export",
+    "exported": "Note exported",
+    "sort": "Sort",
+    "sort_default": "Default",
+    "sort_titleAsc": "Title A→Z",
+    "sort_titleDesc": "Title Z→A"
   },
   "analytics": {
     "title": "Analytics",
