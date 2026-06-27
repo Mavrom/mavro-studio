@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAppStore } from '../store'
 import {
   SlidersHorizontal,
@@ -12,14 +12,17 @@ import {
   Trash2,
   Download
 } from 'lucide-react'
+import { Wallet, Upload, Delete, Refresh } from '../components/icons/iconly'
+import { buildBackup, downloadBackup, restoreBackup, clearAllData, isValidBackup, countBackup } from '../lib/backup'
 
-type Section = 'general' | 'paths' | 'network' | 'account' | 'debug' | 'about'
+type Section = 'general' | 'paths' | 'network' | 'account' | 'data' | 'debug' | 'about'
 
 const NAV: { id: Section; icon: React.ReactNode; labelKey: string }[] = [
   { id: 'general', icon: <SlidersHorizontal size={17} />, labelKey: 'settings.general' },
   { id: 'paths',   icon: <FolderOpen size={17} />,        labelKey: 'settings.paths' },
   { id: 'network', icon: <Network size={17} />,           labelKey: 'settings.proxy' },
   { id: 'account', icon: <User size={17} />,              labelKey: 'settings.account' },
+  { id: 'data',    icon: <Wallet size={17} />,            labelKey: 'settings.data' },
   { id: 'debug',   icon: <Bug size={17} />,               labelKey: 'settings.debug' },
   { id: 'about',   icon: <Info size={17} />,              labelKey: 'settings.about' },
 ]
@@ -56,6 +59,8 @@ export default function Settings() {
   const [proxyHost, setProxyHost] = useState('')
   const [proxyPort, setProxyPort] = useState('')
   const [sysInfo, setSysInfo] = useState<Record<string, string> | null>(null)
+  const [busy, setBusy] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (!window.api) return
@@ -82,7 +87,7 @@ export default function Settings() {
         if (p.host) setProxyHost(p.host as string)
         if (p.port) setProxyPort(p.port as string)
       }
-      setSysInfo(info as Record<string, string>)
+      setSysInfo(info as unknown as Record<string, string>)
     }).catch(console.error)
   }, [])
 
@@ -129,6 +134,81 @@ export default function Settings() {
       const path = await window.api.openDirectory()
       if (path) setter(path)
     }
+  }
+
+  const handleExport = async () => {
+    setBusy(true)
+    try {
+      const backup = await buildBackup()
+      downloadBackup(backup)
+      const c = countBackup(backup)
+      addToast({ message: `${t('settings.exportDone')} (${c.notes}+${c.contacts}+${c.projects})`, type: 'success' })
+    } catch (err) {
+      console.error('export failed', err)
+      addToast({ message: t('settings.exportFailed'), type: 'error' })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setBusy(true)
+    try {
+      const text = await file.text()
+      const parsed = JSON.parse(text)
+      if (!isValidBackup(parsed)) {
+        addToast({ message: t('settings.importInvalid'), type: 'error' })
+        return
+      }
+      const c = countBackup(parsed)
+      const ok = confirm(`${t('settings.importConfirm')}\n\nNot: ${c.notes} · Kişi: ${c.contacts} · Proje: ${c.projects}`)
+      if (!ok) return
+      await restoreBackup(parsed)
+      addToast({ message: t('settings.importDone'), type: 'success' })
+      setTimeout(() => window.location.reload(), 1200)
+    } catch (err) {
+      console.error('import failed', err)
+      addToast({ message: t('settings.importInvalid'), type: 'error' })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const handleClearData = async () => {
+    if (!confirm(t('settings.clearDataConfirm'))) return
+    setBusy(true)
+    try {
+      await clearAllData()
+      addToast({ message: t('settings.clearDataDone'), type: 'warning' })
+      setTimeout(() => window.location.reload(), 1200)
+    } catch (err) {
+      console.error('clear failed', err)
+      addToast({ message: t('settings.exportFailed'), type: 'error' })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const handleResetSettings = async () => {
+    if (!confirm(t('settings.resetConfirm'))) return
+    if (window.api) {
+      await Promise.all([
+        window.api.setSetting('defaultExportPath', ''),
+        window.api.setSetting('dataDirectory', ''),
+        window.api.setSetting('autoStart', false),
+        window.api.setSetting('mavroPath', ''),
+        window.api.setSetting('idePath', ''),
+        window.api.setSetting('startupParams', ''),
+        window.api.setSetting('proxy', { enabled: false, type: 'http', host: '', port: '' })
+      ])
+    }
+    setDefaultExportPath(''); setDataDirectory(''); setAutoStart(false)
+    setMavroPath(''); setIdePath(''); setStartupParams('')
+    setProxyEnabled(false); setProxyType('http'); setProxyHost(''); setProxyPort('')
+    addToast({ message: t('settings.resetDone'), type: 'success' })
   }
 
   const clearLogs = async () => {
@@ -333,6 +413,51 @@ export default function Settings() {
                 </div>
               </div>
             </SCard>
+          )}
+
+          {/* ── DATA / BACKUP ── */}
+          {section === 'data' && (
+            <>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="application/json,.json"
+                style={{ display: 'none' }}
+                onChange={handleImportFile}
+              />
+              <SCard title={t('settings.backup')} color="var(--accent-success)">
+                <div className="form-hint" style={{ marginBottom: 'var(--space-4)' }}>{t('settings.backupDesc')}</div>
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                  <button className="btn btn-primary" onClick={handleExport} disabled={busy}>
+                    <Download size={15} /> {t('settings.exportData')}
+                  </button>
+                  <button className="btn btn-secondary" onClick={() => fileInputRef.current?.click()} disabled={busy}>
+                    <Upload size={15} /> {t('settings.importData')}
+                  </button>
+                </div>
+              </SCard>
+
+              <SCard title={t('settings.dangerZone')} color="var(--accent-danger)">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 'var(--space-4)', borderBottom: '1px solid var(--border-primary)', marginBottom: 'var(--space-4)' }}>
+                  <div>
+                    <div style={{ fontSize: 'var(--font-base)', color: 'var(--text-primary)' }}>{t('settings.resetSettings')}</div>
+                    <div className="form-hint" style={{ marginTop: 2 }}>{t('settings.resetSettingsDesc')}</div>
+                  </div>
+                  <button className="btn btn-secondary btn-sm" onClick={handleResetSettings} disabled={busy}>
+                    <Refresh size={14} /> {t('settings.reset')}
+                  </button>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontSize: 'var(--font-base)', color: 'var(--text-primary)' }}>{t('settings.clearData')}</div>
+                    <div className="form-hint" style={{ marginTop: 2 }}>{t('settings.clearDataDesc')}</div>
+                  </div>
+                  <button className="btn btn-danger btn-sm" onClick={handleClearData} disabled={busy}>
+                    <Delete size={14} /> {t('settings.clear')}
+                  </button>
+                </div>
+              </SCard>
+            </>
           )}
 
           {/* ── DEBUG ── */}

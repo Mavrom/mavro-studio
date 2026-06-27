@@ -7,6 +7,8 @@ import Sidebar from './components/layout/Sidebar'
 import StatusBar from './components/layout/StatusBar'
 import ToastContainer from './components/common/ToastContainer'
 import UpdateModal from './components/common/UpdateModal'
+import CommandPalette from './components/common/CommandPalette'
+import ShortcutsHelp from './components/common/ShortcutsHelp'
 import LoginScreen from './components/auth/LoginScreen'
 import { Loader2 } from 'lucide-react'
 import HomePage from './pages/HomePage'
@@ -14,10 +16,16 @@ import Dashboard from './pages/Dashboard'
 import Projects from './pages/Projects'
 import Notes from './pages/Notes'
 import Contacts from './pages/Contacts'
+import Tools from './pages/Tools'
+import Analytics from './pages/Analytics'
+import Security from './pages/Security'
 import Settings from './pages/Settings'
 
 function App() {
-  const { activePage, setTheme, setLanguage, addToast } = useAppStore()
+  const { activePage, setActivePage, toggleSidebar, setTheme, setLanguage, addToast, addNotification } = useAppStore()
+
+  const [paletteOpen, setPaletteOpen] = useState(false)
+  const [helpOpen, setHelpOpen] = useState(false)
 
   const [updateInfo, setUpdateInfo] = useState<{ version: string } | null>(null)
   const [updateDownloading, setUpdateDownloading] = useState(false)
@@ -80,7 +88,14 @@ function App() {
     if (!window.api) return
     window.api.onUpdateAvailable((info: unknown) => {
       const data = info as { version: string }
-      if (data?.version) setUpdateInfo(data)
+      if (data?.version) {
+        setUpdateInfo(data)
+        addNotification({
+          title: 'Güncelleme mevcut',
+          message: `Yeni sürüm hazır: v${data.version}`,
+          type: 'info'
+        })
+      }
     })
     window.api.onDownloadProgress((progress: unknown) => {
       const p = progress as { percent: number }
@@ -103,6 +118,43 @@ function App() {
     window.api?.downloadUpdate()
   }
 
+  // Global klavye kısayolları
+  useEffect(() => {
+    const PAGES = ['home', 'dashboard', 'projects', 'notes', 'contacts', 'tools', 'settings']
+    const handler = (e: KeyboardEvent) => {
+      const mod = e.ctrlKey || e.metaKey
+      const target = e.target as HTMLElement | null
+      const typing = !!target && (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT' ||
+        target.isContentEditable
+      )
+
+      if (mod && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setPaletteOpen(o => !o)
+        return
+      }
+      if (mod && e.key.toLowerCase() === 'b') {
+        e.preventDefault()
+        toggleSidebar()
+        return
+      }
+      if (mod && /^[1-7]$/.test(e.key)) {
+        e.preventDefault()
+        setActivePage(PAGES[Number(e.key) - 1])
+        return
+      }
+      if (!mod && !typing && (e.key === '?' || (e.shiftKey && e.key === '/'))) {
+        e.preventDefault()
+        setHelpOpen(o => !o)
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [setActivePage, toggleSidebar])
+
   const renderPage = () => {
     switch (activePage) {
       case 'home': return <HomePage />
@@ -110,6 +162,9 @@ function App() {
       case 'projects': return <Projects />
       case 'notes': return <Notes />
       case 'contacts': return <Contacts />
+      case 'tools': return <Tools />
+      case 'analytics': return <Analytics />
+      case 'security': return <Security />
       case 'settings': return <Settings />
       default: return <HomePage />
     }
@@ -150,6 +205,12 @@ function App() {
       </div>
       <StatusBar />
       <ToastContainer />
+      <CommandPalette
+        open={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+        onOpenHelp={() => setHelpOpen(true)}
+      />
+      <ShortcutsHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
       {updateInfo && (
         <UpdateModal
           version={updateInfo.version}

@@ -60,7 +60,7 @@ function formatDisplayDate(dateStr: string, lang: string): string {
 }
 
 export default function HomePage() {
-  const { t, language, addToast } = useAppStore()
+  const { t, language, addToast, addNotification } = useAppStore()
 
   // Calendar state
   const today = new Date()
@@ -138,13 +138,19 @@ export default function HomePage() {
             type: 'warning',
             duration: 8000
           })
+          // Bildirim merkezine ekle
+          addNotification({
+            title: `⏰ ${t('home.alarmTriggered')}`,
+            message: alarm.title,
+            type: 'warning'
+          })
           return { ...alarm, triggered: true }
         }
         return alarm
       })
       return changed ? updated : prev
     })
-  }, [addToast, t])
+  }, [addToast, addNotification, t])
 
   useEffect(() => {
     checkAlarms()

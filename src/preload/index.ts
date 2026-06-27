@@ -19,6 +19,7 @@ const api = {
 
   // System
   getSystemInfo: () => ipcRenderer.invoke('system:info'),
+  getDiskUsage: () => ipcRenderer.invoke('system:disk'),
 
   // Dialogs
   openDirectory: () => ipcRenderer.invoke('dialog:openDirectory'),

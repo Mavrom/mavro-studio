@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAppStore } from '../store'
 import { loadData, saveData } from '../lib/cloudData'
-import { Search, Plus, Trash2, Edit2, User, Key, Phone, Calendar, Info, Eye, EyeOff } from 'lucide-react'
+import { Search, Plus, Trash2, Edit2, User, Key, Phone, Calendar, Info, Eye, EyeOff, ArrowDownUp } from 'lucide-react'
+import { Star, Download } from '../components/icons/iconly'
 
 interface Contact {
   id: string
@@ -11,6 +12,33 @@ interface Contact {
   phone: string       // Telefon
   birthday: string    // Doğum Günü (YYYY-MM-DD format)
   info: string        // Info (dip not)
+  favorite?: boolean
+}
+
+function downloadTextFile(filename: string, content: string, mime: string) {
+  const blob = new Blob([content], { type: mime })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
+// Bir sonraki doğum gününe kalan gün sayısı (yoksa null)
+function daysUntilBirthday(birthday: string): number | null {
+  if (!birthday) return null
+  const parts = birthday.split('-').map(Number)
+  if (parts.length !== 3) return null
+  const [, m, d] = parts
+  if (!m || !d) return null
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  let next = new Date(now.getFullYear(), m - 1, d)
+  if (next < today) next = new Date(now.getFullYear() + 1, m - 1, d)
+  return Math.round((next.getTime() - today.getTime()) / 86400000)
 }
 
 const DEFAULT_CONTACTS: Contact[] = []
@@ -254,6 +282,9 @@ export default function Contacts() {
   const [birthday, setBirthday] = useState('')
   const [info, setInfo] = useState('')
   const [censorEnabled, setCensorEnabled] = useState(true)
+  const [favOnly, setFavOnly] = useState(false)
+  const [sortAsc, setSortAsc] = useState(true)
+  const [showExport, setShowExport] = useState(false)
 
   useEffect(() => {
     const mapItems = (arr: any[]) =>
@@ -264,7 +295,8 @@ export default function Contacts() {
         customId: item.customId || `ID-${Math.floor(Math.random() * 10000)}`,
         phone: item.phone || '',
         birthday: item.birthday || '1995-01-01',
-        info: item.info || item.company || ''
+        info: item.info || item.company || '',
+        favorite: item.favorite || false
       }))
     const load = async () => {
       const cloud = await loadData<any>('contacts')
@@ -303,6 +335,7 @@ export default function Contacts() {
     if (editContactId) {
       // Edit Mode
       setContacts(prev => prev.map(c => c.id === editContactId ? {
+        ...c,
         id: editContactId,
         name: finalName,
         username: finalUsername,
@@ -354,11 +387,64 @@ export default function Contacts() {
     addToast({ message: 'Kişi silindi', type: 'warning' })
   }
 
-  const filteredContacts = contacts.filter((c) =>
-    c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.customId.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const toggleFavorite = (id: string) => {
+    setContacts(prev => prev.map(c => c.id === id ? { ...c, favorite: !c.favorite } : c))
+  }
+
+  const copyValue = (value: string) => {
+    if (!value || value === '-') return
+    navigator.clipboard.writeText(value).then(
+      () => addToast({ message: t('tools.copied'), type: 'success' }),
+      () => addToast({ message: t('tools.copyFailed'), type: 'error' })
+    )
+  }
+
+  const exportCsv = () => {
+    const header = ['name', 'username', 'customId', 'phone', 'birthday', 'info', 'favorite']
+    const esc = (v: string) => `"${(v || '').replace(/"/g, '""')}"`
+    const rows = contacts.map(c => [c.name, c.username, c.customId, c.phone, c.birthday, c.info, c.favorite ? '1' : '0'].map(esc).join(','))
+    const csv = [header.join(','), ...rows].join('\n')
+    downloadTextFile(`mavro-contacts-${new Date().toISOString().slice(0, 10)}.csv`, '﻿' + csv, 'text/csv')
+    setShowExport(false)
+    addToast({ message: t('contacts.exported'), type: 'success' })
+  }
+
+  const exportVcard = () => {
+    const vcards = contacts.map(c => {
+      const lines = [
+        'BEGIN:VCARD', 'VERSION:3.0',
+        `FN:${c.name}`,
+        c.username ? `NICKNAME:${c.username}` : '',
+        c.phone ? `TEL;TYPE=CELL:${c.phone}` : '',
+        c.birthday ? `BDAY:${c.birthday}` : '',
+        c.info ? `NOTE:${c.info.replace(/\n/g, '\\n')}` : '',
+        'END:VCARD'
+      ].filter(Boolean)
+      return lines.join('\n')
+    })
+    downloadTextFile(`mavro-contacts-${new Date().toISOString().slice(0, 10)}.vcf`, vcards.join('\n'), 'text/vcard')
+    setShowExport(false)
+    addToast({ message: t('contacts.exported'), type: 'success' })
+  }
+
+  const filteredContacts = contacts
+    .filter((c) =>
+      (!favOnly || c.favorite) && (
+        c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        c.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        c.customId.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    )
+    .sort((a, b) => {
+      if (!!a.favorite !== !!b.favorite) return a.favorite ? -1 : 1
+      return sortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
+    })
+
+  // Önümüzdeki 30 gün içindeki doğum günleri
+  const upcomingBirthdays = contacts
+    .map(c => ({ c, days: daysUntilBirthday(c.birthday) }))
+    .filter(x => x.days !== null && (x.days as number) <= 30)
+    .sort((a, b) => (a.days as number) - (b.days as number))
 
   return (
     <div className="animate-fade-in">
@@ -403,6 +489,38 @@ export default function Contacts() {
           />
         </div>
         <button
+          className={`btn btn-secondary ${favOnly ? 'btn-active' : ''}`}
+          onClick={() => setFavOnly(f => !f)}
+          title={t('contacts.favorites')}
+          type="button"
+        >
+          <Star size={16} />
+          <span>{t('contacts.favorites')}</span>
+        </button>
+        <button
+          className="btn btn-secondary btn-icon"
+          onClick={() => setSortAsc(s => !s)}
+          title={`${t('contacts.sort')} ${sortAsc ? 'A→Z' : 'Z→A'}`}
+          type="button"
+        >
+          <ArrowDownUp size={16} />
+        </button>
+        <div style={{ position: 'relative' }}>
+          <button className="btn btn-secondary" onClick={() => setShowExport(s => !s)} title={t('common.export')} type="button">
+            <Download size={16} />
+            <span>{t('common.export')}</span>
+          </button>
+          {showExport && (
+            <>
+              <div className="notes-export-backdrop" onClick={() => setShowExport(false)} />
+              <div className="notes-export-menu animate-fade-in">
+                <button onClick={exportCsv}>CSV (.csv)</button>
+                <button onClick={exportVcard}>vCard (.vcf)</button>
+              </div>
+            </>
+          )}
+        </div>
+        <button
           className="btn btn-secondary"
           onClick={() => setCensorEnabled(!censorEnabled)}
           title={censorEnabled ? t('contacts.censorOff') : t('contacts.censorOn')}
@@ -412,6 +530,20 @@ export default function Contacts() {
           <span>{censorEnabled ? t('contacts.censorOff') : t('contacts.censorOn')}</span>
         </button>
       </div>
+
+      {upcomingBirthdays.length > 0 && (
+        <div className="contacts-birthday-banner animate-fade-in">
+          <Calendar size={15} />
+          <span className="contacts-birthday-text">
+            {t('contacts.upcomingBirthdays')}:
+            {upcomingBirthdays.slice(0, 4).map(({ c, days }) => (
+              <span key={c.id} className="contacts-birthday-chip">
+                {c.name} · {days === 0 ? t('contacts.today') : `${days} ${t('contacts.daysLeft')}`}
+              </span>
+            ))}
+          </span>
+        </div>
+      )}
 
       <div className="page-content mt-6 flex flex-col gap-6">
         {/* Dynamic Add / Edit Form */}
@@ -536,19 +668,19 @@ export default function Contacts() {
                         </div>
                       </td>
                       <td>
-                        <div className="flex items-center gap-1 text-muted">
+                        <div className="flex items-center gap-1 text-muted contact-copy" title={t('contacts.copy')} onClick={() => copyValue(c.username)}>
                           <User size={12} />
                           <span>{displayUsername}</span>
                         </div>
                       </td>
                       <td>
-                        <div className="flex items-center gap-1 text-muted">
+                        <div className="flex items-center gap-1 text-muted contact-copy" title={t('contacts.copy')} onClick={() => copyValue(c.customId)}>
                           <Key size={12} />
                           <span>{displayCustomId}</span>
                         </div>
                       </td>
                       <td>
-                        <div className="flex items-center gap-1 text-muted">
+                        <div className="flex items-center gap-1 text-muted contact-copy" title={t('contacts.copy')} onClick={() => copyValue(c.phone)}>
                           <Phone size={12} />
                           <span>{displayPhone}</span>
                         </div>
@@ -557,6 +689,12 @@ export default function Contacts() {
                         <div className="flex items-center gap-1 text-muted">
                           <Calendar size={12} />
                           <span>{c.birthday || '-'}</span>
+                          {(() => {
+                            const d = daysUntilBirthday(c.birthday)
+                            return d !== null && d <= 7
+                              ? <span className="contact-bday-badge">{d === 0 ? '🎂' : `${d}g`}</span>
+                              : null
+                          })()}
                         </div>
                       </td>
                       <td>
@@ -567,6 +705,14 @@ export default function Contacts() {
                       </td>
                       <td>
                         <div className="flex justify-center gap-2">
+                          <button
+                            className="btn btn-secondary btn-sm btn-icon"
+                            style={{ width: 26, height: 26, color: c.favorite ? 'var(--accent-warning)' : undefined }}
+                            onClick={() => toggleFavorite(c.id)}
+                            title={t('contacts.favorites')}
+                          >
+                            <Star size={12} />
+                          </button>
                           <button
                             className="btn btn-secondary btn-sm btn-icon"
                             style={{ width: 26, height: 26 }}

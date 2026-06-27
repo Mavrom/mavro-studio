@@ -13,6 +13,7 @@ import {
   ChevronsLeft,
   ChevronDown
 } from 'lucide-react'
+import { Category, Chart, ShieldDone } from '../icons/iconly'
 
 interface SidebarItemProps {
   page: string
@@ -127,6 +128,21 @@ export default function Sidebar() {
           page="contacts"
           icon={<Users2 />}
           label={t('nav.contacts')}
+        />
+        <SidebarItem
+          page="tools"
+          icon={<Category size={22} />}
+          label={t('nav.tools')}
+        />
+        <SidebarItem
+          page="analytics"
+          icon={<Chart size={22} />}
+          label={t('nav.analytics')}
+        />
+        <SidebarItem
+          page="security"
+          icon={<ShieldDone size={22} />}
+          label={t('nav.security')}
         />
       </nav>
 

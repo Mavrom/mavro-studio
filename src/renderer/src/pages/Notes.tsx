@@ -6,8 +6,9 @@ import {
   Link2, ExternalLink, Bold, Italic, Underline, Strikethrough, Highlighter, Code,
   Heading1, Heading2, Heading3, Quote, List, ListOrdered, ListChecks,
   Table, SquareCode, Minus, Scissors, Copy, ClipboardPaste, Type, TextSelect,
-  ChevronRight, CaseSensitive
+  ChevronRight, CaseSensitive, ArrowDownUp
 } from 'lucide-react'
+import { Bookmark, Download, Show, Copy as CopyIcon } from '../components/icons/iconly'
 
 interface Note {
   id: string
@@ -16,6 +17,45 @@ interface Note {
   isSnippet: boolean
   updatedAt: string
   format?: 'html'
+  pinned?: boolean
+}
+
+type SortBy = 'default' | 'titleAsc' | 'titleDesc'
+
+// Basit HTML → Markdown dönüştürücü (dışa aktarma için)
+function htmlToMarkdown(html: string): string {
+  let md = html
+  md = md.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '# $1\n\n')
+  md = md.replace(/<h2[^>]*>(.*?)<\/h2>/gi, '## $1\n\n')
+  md = md.replace(/<h3[^>]*>(.*?)<\/h3>/gi, '### $1\n\n')
+  md = md.replace(/<(strong|b)[^>]*>(.*?)<\/(strong|b)>/gi, '**$2**')
+  md = md.replace(/<(em|i)[^>]*>(.*?)<\/(em|i)>/gi, '*$2*')
+  md = md.replace(/<del[^>]*>(.*?)<\/del>/gi, '~~$1~~')
+  md = md.replace(/<code[^>]*>(.*?)<\/code>/gi, '`$1`')
+  md = md.replace(/<a [^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/gi, '[$2]($1)')
+  md = md.replace(/<blockquote[^>]*>(.*?)<\/blockquote>/gi, '> $1\n\n')
+  md = md.replace(/<li[^>]*>(.*?)<\/li>/gi, '- $1\n')
+  md = md.replace(/<\/(p|div|h[1-6]|ul|ol|tr)>/gi, '\n')
+  md = md.replace(/<br\s*\/?>/gi, '\n')
+  md = md.replace(/<[^>]+>/g, '')
+  md = md.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+  return md.replace(/\n{3,}/g, '\n\n').trim()
+}
+
+function downloadFile(filename: string, content: string, mime: string) {
+  const blob = new Blob([content], { type: mime })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
+function safeFileName(name: string): string {
+  return (name || 'not').replace(/[^a-z0-9çğıöşü _-]/gi, '').trim().slice(0, 60) || 'not'
 }
 
 // Mevcut (eski) markdown notları tek seferlik HTML'e çevirmek için.
@@ -127,6 +167,8 @@ export default function Notes() {
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null)
   const [openSub, setOpenSub] = useState<string | null>(null)
   const [isPreview, setIsPreview] = useState(false)
+  const [sortBy, setSortBy] = useState<SortBy>('default')
+  const [showExport, setShowExport] = useState(false)
 
   const today = () => {
     const d = new Date()
@@ -218,6 +260,43 @@ export default function Notes() {
 
   const updateTitle = (val: string) => {
     setNotes(notes.map((n) => (n.id === activeNoteId ? { ...n, title: val } : n)))
+  }
+
+  const togglePin = (id: string) => {
+    setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, pinned: !n.pinned } : n)))
+  }
+
+  const toggleSnippet = (id: string) => {
+    setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, isSnippet: !n.isSnippet } : n)))
+  }
+
+  const duplicateNote = (id: string) => {
+    const src = notes.find((n) => n.id === id)
+    if (!src) return
+    const copy: Note = {
+      ...src,
+      id: Date.now().toString(),
+      title: `${src.title} (kopya)`,
+      pinned: false,
+      updatedAt: today()
+    }
+    setNotes([copy, ...notes])
+    setActiveNoteId(copy.id)
+    addToast({ message: 'Not çoğaltıldı', type: 'success' })
+  }
+
+  const exportNote = (fmt: 'html' | 'md') => {
+    if (!activeNote) return
+    const base = safeFileName(activeNote.title)
+    if (fmt === 'html') {
+      const doc = `<!doctype html><html><head><meta charset="utf-8"><title>${activeNote.title}</title></head><body>${activeNote.content || ''}</body></html>`
+      downloadFile(`${base}.html`, doc, 'text/html')
+    } else {
+      const md = `# ${activeNote.title}\n\n${htmlToMarkdown(activeNote.content || '')}`
+      downloadFile(`${base}.md`, md, 'text/markdown')
+    }
+    setShowExport(false)
+    addToast({ message: t('notes.exported'), type: 'success' })
   }
 
   // ============ WYSIWYG BİÇİMLENDİRME ============
@@ -320,9 +399,15 @@ export default function Notes() {
     }
   }, [menu])
 
-  const filteredNotes = notes.filter((n) =>
-    n.title.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredNotes = notes
+    .filter((n) => n.title.toLowerCase().includes(searchTerm.toLowerCase()))
+    .sort((a, b) => {
+      // Sabitlenmiş notlar her zaman üstte
+      if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1
+      if (sortBy === 'titleAsc') return a.title.localeCompare(b.title)
+      if (sortBy === 'titleDesc') return b.title.localeCompare(a.title)
+      return 0
+    })
 
   // Liste önizlemesi: HTML etiketleri ayıklanmış ilk metin
   const previewLine = (c: string) =>
@@ -368,9 +453,18 @@ export default function Notes() {
               {t('notes.title')}
               <span className="notes-count">{notes.length}</span>
             </span>
-            <button className="notes-icon-btn" onClick={createNote} title={t('notes.newNote')}>
-              <Plus size={16} />
-            </button>
+            <div style={{ display: 'flex', gap: 2 }}>
+              <button
+                className="notes-icon-btn"
+                onClick={() => setSortBy((s) => (s === 'default' ? 'titleAsc' : s === 'titleAsc' ? 'titleDesc' : 'default'))}
+                title={`${t('notes.sort')}: ${t('notes.sort_' + sortBy)}`}
+              >
+                <ArrowDownUp size={15} />
+              </button>
+              <button className="notes-icon-btn" onClick={createNote} title={t('notes.newNote')}>
+                <Plus size={16} />
+              </button>
+            </div>
           </div>
 
           <div className="notes-search">
@@ -392,16 +486,26 @@ export default function Notes() {
                 return (
                   <div
                     key={n.id}
-                    className={`note-item ${n.id === activeNoteId ? 'active' : ''}`}
+                    className={`note-item ${n.id === activeNoteId ? 'active' : ''} ${n.pinned ? 'pinned' : ''}`}
                     onClick={() => setActiveNoteId(n.id)}
                   >
                     <span className="note-item-icon">
                       {n.isSnippet ? <Code size={15} /> : <FileText size={15} />}
                     </span>
                     <span className="note-item-body">
-                      <span className="note-item-title">{n.title || t('notes.untitled')}</span>
+                      <span className="note-item-title">
+                        {n.pinned && <Bookmark size={11} />}
+                        {n.title || t('notes.untitled')}
+                      </span>
                       <span className="note-item-snippet">{preview || t('notes.untitled')}</span>
                     </span>
+                    <button
+                      className="note-item-del"
+                      title={n.pinned ? t('notes.unpin') : t('notes.pin')}
+                      onClick={(e) => { e.stopPropagation(); togglePin(n.id) }}
+                    >
+                      <Bookmark size={13} />
+                    </button>
                     <button
                       className="note-item-del"
                       title={t('notes.delete') || 'Sil'}
@@ -430,6 +534,46 @@ export default function Notes() {
                 onChange={(e) => updateTitle(e.target.value)}
                 placeholder={t('notes.untitled')}
               />
+              <div className="notes-editor-tools">
+                <button
+                  className={`notes-tool-btn ${isPreview ? 'active' : ''}`}
+                  onClick={() => setIsPreview((p) => !p)}
+                  title={t('notes.preview')}
+                >
+                  <Show size={15} />
+                </button>
+                <button
+                  className={`notes-tool-btn ${activeNote.pinned ? 'active' : ''}`}
+                  onClick={() => togglePin(activeNote.id)}
+                  title={activeNote.pinned ? t('notes.unpin') : t('notes.pin')}
+                >
+                  <Bookmark size={15} />
+                </button>
+                <button
+                  className={`notes-tool-btn ${activeNote.isSnippet ? 'active' : ''}`}
+                  onClick={() => toggleSnippet(activeNote.id)}
+                  title={t('notes.markSnippet')}
+                >
+                  <Code size={15} />
+                </button>
+                <button className="notes-tool-btn" onClick={() => duplicateNote(activeNote.id)} title={t('notes.duplicate')}>
+                  <CopyIcon size={15} />
+                </button>
+                <div className="notes-export-wrap">
+                  <button className="notes-tool-btn" onClick={() => setShowExport((s) => !s)} title={t('notes.export')}>
+                    <Download size={15} />
+                  </button>
+                  {showExport && (
+                    <>
+                      <div className="notes-export-backdrop" onClick={() => setShowExport(false)} />
+                      <div className="notes-export-menu animate-fade-in">
+                        <button onClick={() => exportNote('md')}>Markdown (.md)</button>
+                        <button onClick={() => exportNote('html')}>HTML (.html)</button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
 
             {!isPreview ? (

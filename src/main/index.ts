@@ -23,7 +23,7 @@ function getSettingsStore(): Store {
   const key = activeUserId || 'guest'
   if (!settingsStoreCache.has(key)) {
     const name = activeUserId ? `settings_${activeUserId}` : 'guest_settings'
-    settingsStoreCache.set(key, new Store({
+    settingsStoreCache.set(key, new Store<Record<string, unknown>>({
       name,
       defaults: {
         language: 'tr',
@@ -60,7 +60,7 @@ function getDataStore(): Store {
   const key = activeUserId || 'guest'
   if (!dataStoreCache.has(key)) {
     const name = activeUserId ? `appdata_${activeUserId}` : 'guest_appdata'
-    dataStoreCache.set(key, new Store({
+    dataStoreCache.set(key, new Store<Record<string, unknown>>({
       name,
       defaults: {
         projects: [],
@@ -185,6 +185,22 @@ ipcMain.handle('system:info', () => {
     appPath: app.getAppPath(),
     userDataPath: app.getPath('userData'),
     logsPath: app.getPath('logs')
+  }
+})
+
+// Disk usage of the volume holding the user's home directory
+ipcMain.handle('system:disk', async () => {
+  const fs = await import('fs/promises')
+  try {
+    const stats = await fs.statfs(os.homedir())
+    const total = stats.blocks * stats.bsize
+    const free = stats.bfree * stats.bsize
+    const used = total - free
+    const percent = total > 0 ? Math.round((used / total) * 100) : 0
+    return { total, free, used, percent }
+  } catch (err) {
+    console.error('system:disk error', err)
+    return null
   }
 })
 
