@@ -38,7 +38,18 @@
     "cpu": "CPU Kullanımı",
     "memory": "Bellek",
     "disk": "Disk",
-    "network": "Ağ Durumu"
+    "network": "Ağ Durumu",
+    "greetMorning": "Günaydın",
+    "greetAfternoon": "İyi günler",
+    "greetEvening": "İyi akşamlar",
+    "greetNight": "İyi geceler",
+    "processor": "İşlemci",
+    "cores": "Çekirdek",
+    "host": "Ana Bilgisayar",
+    "platform": "Platform",
+    "upcoming": "Yaklaşan Etkinlikler",
+    "noUpcoming": "Yaklaşan etkinlik yok",
+    "viewCalendar": "Takvime Git"
   },
   "projects": {
     "title": "Projeler",

@@ -38,7 +38,18 @@
     "cpu": "CPU Usage",
     "memory": "Memory",
     "disk": "Disk",
-    "network": "Network"
+    "network": "Network",
+    "greetMorning": "Good morning",
+    "greetAfternoon": "Good afternoon",
+    "greetEvening": "Good evening",
+    "greetNight": "Good night",
+    "processor": "Processor",
+    "cores": "Cores",
+    "host": "Hostname",
+    "platform": "Platform",
+    "upcoming": "Upcoming Events",
+    "noUpcoming": "No upcoming events",
+    "viewCalendar": "Go to Calendar"
   },
   "projects": {
     "title": "Projects",
