@@ -35,6 +35,7 @@ export default function CommandPalette({ open, onClose, onOpenHelp }: Props) {
     { id: 'notes', label: t('nav.notes'), hint: t('cmd.goto'), icon: <Paper size={17} />, run: () => go('notes') },
     { id: 'contacts', label: t('nav.contacts'), hint: t('cmd.goto'), icon: <Profile size={17} />, run: () => go('contacts') },
     { id: 'tools', label: t('nav.tools'), hint: t('cmd.goto'), icon: <Category size={17} />, run: () => go('tools') },
+    { id: 'analytics', label: t('nav.analytics'), hint: t('cmd.goto'), icon: <Chart size={17} />, run: () => go('analytics') },
     { id: 'security', label: t('nav.security'), hint: t('cmd.goto'), icon: <ShieldDone size={17} />, run: () => go('security') },
     { id: 'settings', label: t('nav.settings'), hint: t('cmd.goto'), icon: <Setting size={17} />, run: () => go('settings') },
     { id: 'sidebar', label: t('cmd.toggleSidebar'), hint: t('cmd.action'), icon: <Swap size={17} />, run: () => { toggleSidebar(); onClose() } },

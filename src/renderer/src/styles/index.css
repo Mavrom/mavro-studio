@@ -4352,3 +4352,19 @@ div.obsidian-editor:focus::before {
   text-overflow: ellipsis;
 }
 .dashboard-upcoming-meta { font-size: var(--font-xs); color: var(--text-muted); font-family: var(--font-mono); }
+
+/* ============================================================
+   ANALYTICS sayfası
+   ============================================================ */
+.analytics-stat { display: flex; align-items: center; gap: var(--space-4); }
+.analytics-stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+.recharts-default-legend { font-size: 12px; }
+.recharts-text { fill: var(--text-muted); }

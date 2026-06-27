@@ -10,6 +10,7 @@
     "notes": "Notes",
     "contacts": "Contacts",
     "tools": "Tools",
+    "analytics": "Analytics",
     "security": "Security",
     "settings": "Settings"
   },
@@ -144,7 +145,12 @@
     "last7days": "Last 7 Days",
     "last30days": "Last 30 Days",
     "last90days": "Last 90 Days",
-    "export": "Export"
+    "export": "Export",
+    "byStatus": "Projects by Status",
+    "byPlatform": "Projects by Platform",
+    "byMonth": "Projects Created by Month",
+    "birthdays": "Birthdays by Month",
+    "emptyHint": "Add projects, notes or contacts first to see charts."
   },
   "tools": {
     "title": "Tools",

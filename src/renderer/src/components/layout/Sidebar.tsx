@@ -13,7 +13,7 @@ import {
   ChevronsLeft,
   ChevronDown
 } from 'lucide-react'
-import { Category } from '../icons/iconly'
+import { Category, Chart } from '../icons/iconly'
 
 interface SidebarItemProps {
   page: string
@@ -133,6 +133,11 @@ export default function Sidebar() {
           page="tools"
           icon={<Category size={22} />}
           label={t('nav.tools')}
+        />
+        <SidebarItem
+          page="analytics"
+          icon={<Chart size={22} />}
+          label={t('nav.analytics')}
         />
       </nav>
 

@@ -10,6 +10,7 @@
     "notes": "Notlar",
     "contacts": "Kişiler",
     "tools": "Araçlar",
+    "analytics": "Analitik",
     "security": "Güvenlik",
     "settings": "Ayarlar"
   },
@@ -144,7 +145,12 @@
     "last7days": "Son 7 Gün",
     "last30days": "Son 30 Gün",
     "last90days": "Son 90 Gün",
-    "export": "Dışa Aktar"
+    "export": "Dışa Aktar",
+    "byStatus": "Duruma Göre Projeler",
+    "byPlatform": "Platforma Göre Projeler",
+    "byMonth": "Aylara Göre Oluşturulan Projeler",
+    "birthdays": "Aylara Göre Doğum Günleri",
+    "emptyHint": "Grafikler için önce proje, not veya kişi ekleyin."
   },
   "tools": {
     "title": "Araçlar",
