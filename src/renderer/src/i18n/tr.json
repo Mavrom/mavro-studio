@@ -285,7 +285,21 @@
     "encryptData": "Veri Şifreleme",
     "encryptDataDesc": "Yerel verileri AES-256 ile şifrele",
     "enabled": "Etkin",
-    "disabled": "Devre Dışı"
+    "disabled": "Devre Dışı",
+    "addCredential": "Şifre Ekle",
+    "service": "Servis / Platform",
+    "username": "Kullanıcı Adı",
+    "password": "Şifre / Token",
+    "generate": "Üret",
+    "credAdded": "Şifre kaydedildi",
+    "credDeleted": "Şifre silindi",
+    "serviceRequired": "Servis adı zorunlu",
+    "noCredentials": "Henüz kayıtlı şifre yok. Geliştirici şifrelerini ve token'larını güvenle sakla.",
+    "copyPassword": "Şifreyi kopyala",
+    "reveal": "Göster / Gizle",
+    "mfaOnHint": "İki faktörlü doğrulama etkin.",
+    "mfaOffHint": "Güvenliği artırmak için MFA'yı etkinleştirin.",
+    "localOnly": "Şifreler yalnızca bu cihazda saklanır; buluta gönderilmez."
   },
   "settings": {
     "title": "Ayarlar",

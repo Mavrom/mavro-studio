@@ -18,6 +18,7 @@ import Notes from './pages/Notes'
 import Contacts from './pages/Contacts'
 import Tools from './pages/Tools'
 import Analytics from './pages/Analytics'
+import Security from './pages/Security'
 import Settings from './pages/Settings'
 
 function App() {
@@ -163,6 +164,7 @@ function App() {
       case 'contacts': return <Contacts />
       case 'tools': return <Tools />
       case 'analytics': return <Analytics />
+      case 'security': return <Security />
       case 'settings': return <Settings />
       default: return <HomePage />
     }

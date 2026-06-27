@@ -285,7 +285,21 @@
     "encryptData": "Data Encryption",
     "encryptDataDesc": "Encrypt local data with AES-256",
     "enabled": "Enabled",
-    "disabled": "Disabled"
+    "disabled": "Disabled",
+    "addCredential": "Add Password",
+    "service": "Service / Platform",
+    "username": "Username",
+    "password": "Password / Token",
+    "generate": "Generate",
+    "credAdded": "Password saved",
+    "credDeleted": "Password deleted",
+    "serviceRequired": "Service name is required",
+    "noCredentials": "No saved passwords yet. Securely store developer passwords and tokens.",
+    "copyPassword": "Copy password",
+    "reveal": "Show / Hide",
+    "mfaOnHint": "Two-factor authentication is enabled.",
+    "mfaOffHint": "Enable MFA to improve your security.",
+    "localOnly": "Passwords are stored on this device only; never uploaded to the cloud."
   },
   "settings": {
     "title": "Settings",
