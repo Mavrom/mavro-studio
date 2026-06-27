@@ -4,7 +4,7 @@ import { loadData, saveData } from '../lib/cloudData'
 import {
   Search, Plus, Star, Edit, Trash2, Eye, X, ChevronLeft, ChevronRight,
   Folder, FolderOpen, File as FileIcon, ExternalLink, Link2, Hash, Calendar, Clock,
-  LayoutGrid, ArrowDownUp, AlertTriangle
+  LayoutGrid, AlertTriangle
 } from 'lucide-react'
 import { Download, Copy as CopyIcon } from '../components/icons/iconly'
 

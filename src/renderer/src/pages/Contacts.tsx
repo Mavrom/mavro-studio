@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useAppStore } from '../store'
 import { loadData, saveData } from '../lib/cloudData'
 import { Search, Plus, Trash2, Edit2, User, Key, Phone, Calendar, Info, Eye, EyeOff, ArrowDownUp } from 'lucide-react'
-import { Star, Download, Copy as CopyIcon } from '../components/icons/iconly'
+import { Star, Download } from '../components/icons/iconly'
 
 interface Contact {
   id: string
