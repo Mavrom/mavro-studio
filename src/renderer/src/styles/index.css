@@ -4463,3 +4463,20 @@ div.obsidian-editor:focus::before {
   font-size: var(--font-xs);
   color: var(--text-primary);
 }
+
+/* ============================================================
+   PROJELER — gecikme rozeti
+   ============================================================ */
+.kanban-overdue {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 2px 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(248,113,113,0.14);
+  color: var(--accent-danger);
+  font-size: 10px;
+  font-weight: 700;
+  width: fit-content;
+}

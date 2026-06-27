@@ -4,8 +4,23 @@ import { loadData, saveData } from '../lib/cloudData'
 import {
   Search, Plus, Star, Edit, Trash2, Eye, X, ChevronLeft, ChevronRight,
   Folder, FolderOpen, File as FileIcon, ExternalLink, Link2, Hash, Calendar, Clock,
-  LayoutGrid
+  LayoutGrid, ArrowDownUp, AlertTriangle
 } from 'lucide-react'
+import { Download, Copy as CopyIcon } from '../components/icons/iconly'
+
+type ProjectSort = 'manual' | 'nameAsc' | 'dateNew'
+
+function projectsDownload(filename: string, content: string, mime: string) {
+  const blob = new Blob([content], { type: mime })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
 
 export type ProjectStatus = 'draft' | 'production' | 'published' | 'cancelled'
 
@@ -67,6 +82,8 @@ export default function Projects() {
   const { t, addToast } = useAppStore()
   const [searchTerm, setSearchTerm] = useState('')
   const [activeTab, setActiveTab] = useState<'all' | 'favorites'>('all')
+  const [sortBy, setSortBy] = useState<ProjectSort>('manual')
+  const [showExport, setShowExport] = useState(false)
   const [projects, setProjects] = useState<Project[]>([])
   const [loaded, setLoaded] = useState(false)
 
@@ -180,6 +197,51 @@ export default function Projects() {
     e.stopPropagation()
     setProjects(projects.map(p => p.id === id ? { ...p, favorite: !p.favorite } : p))
     addToast({ message: t('projects.projectUpdated'), type: 'success' })
+  }
+
+  const duplicateProject = (p: Project, e: React.MouseEvent) => {
+    e.stopPropagation()
+    const copy: Project = {
+      ...p,
+      id: Date.now().toString(),
+      name: `${p.name} (kopya)`,
+      favorite: false,
+      createdAt: new Date().toISOString()
+    }
+    setProjects(prev => [copy, ...prev])
+    addToast({ message: t('projects.projectCreated'), type: 'success' })
+  }
+
+  const isOverdue = (p: Project): boolean => {
+    if (!p.publishDate) return false
+    if (p.status === 'published' || p.status === 'cancelled') return false
+    const today = new Date().toISOString().slice(0, 10)
+    return p.publishDate.slice(0, 10) < today
+  }
+
+  const exportProjects = (fmt: 'json' | 'csv') => {
+    const stamp = new Date().toISOString().slice(0, 10)
+    if (fmt === 'json') {
+      projectsDownload(`mavro-projects-${stamp}.json`, JSON.stringify(projects, null, 2), 'application/json')
+    } else {
+      const header = ['name', 'status', 'description', 'creator', 'platform', 'startDate', 'publishDate', 'viewCount', 'tags']
+      const esc = (v: string) => `"${(v || '').replace(/"/g, '""')}"`
+      const rows = projects.map(p => [
+        p.name, p.status, p.description, p.creator, p.platform,
+        p.startDate || '', p.publishDate || '', p.viewCount || '', (p.tags || []).join(' ')
+      ].map(esc).join(','))
+      projectsDownload(`mavro-projects-${stamp}.csv`, '﻿' + [header.join(','), ...rows].join('\n'), 'text/csv')
+    }
+    setShowExport(false)
+    addToast({ message: t('projects.exported'), type: 'success' })
+  }
+
+  const sortColumn = (list: Project[]): Project[] => {
+    if (sortBy === 'manual') return list
+    const sorted = [...list]
+    if (sortBy === 'nameAsc') sorted.sort((a, b) => a.name.localeCompare(b.name))
+    else if (sortBy === 'dateNew') sorted.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
+    return sorted
   }
 
   const deleteProject = (id: string, e: React.MouseEvent) => {
@@ -582,6 +644,31 @@ export default function Projects() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
+        <select
+          className="select"
+          style={{ width: 'auto' }}
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value as ProjectSort)}
+          title={t('projects.sort')}
+        >
+          <option value="manual">{t('projects.sortManual')}</option>
+          <option value="nameAsc">{t('projects.sortName')}</option>
+          <option value="dateNew">{t('projects.sortDate')}</option>
+        </select>
+        <div style={{ position: 'relative' }}>
+          <button className="btn btn-secondary btn-icon" onClick={() => setShowExport(s => !s)} title={t('common.export')} type="button">
+            <Download size={16} />
+          </button>
+          {showExport && (
+            <>
+              <div className="notes-export-backdrop" onClick={() => setShowExport(false)} />
+              <div className="notes-export-menu animate-fade-in">
+                <button onClick={() => exportProjects('json')}>JSON (.json)</button>
+                <button onClick={() => exportProjects('csv')}>CSV (.csv)</button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       <div className="kanban-filter-bar">
@@ -602,7 +689,7 @@ export default function Projects() {
       <div className="page-content" style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: 0, overflow: 'hidden' }}>
         <div className="kanban-board">
           {COLUMNS.map(col => {
-            const columnProjects = filteredProjects.filter(p => p.status === col.id)
+            const columnProjects = sortColumn(filteredProjects.filter(p => p.status === col.id))
             const isOver = dragOverColumn === col.id
             const isCollapsed = collapsed.has(col.id)
 
@@ -672,6 +759,10 @@ export default function Projects() {
                         >
                           <div className="kanban-card-title">{p.name}</div>
 
+                          {isOverdue(p) && (
+                            <div className="kanban-overdue"><AlertTriangle size={11} /> {t('projects.overdue')}</div>
+                          )}
+
                           {p.creator && (
                             <div className="kanban-card-creator">
                               <span className="kanban-card-creator-dot" />
@@ -712,6 +803,9 @@ export default function Projects() {
                             </button>
                             <button onClick={(e) => openEditModal(p, e)} title={t('projects.edit')}>
                               <Edit size={12} />
+                            </button>
+                            <button onClick={(e) => duplicateProject(p, e)} title={t('projects.duplicate')}>
+                              <CopyIcon size={12} />
                             </button>
                             <button className="danger" onClick={(e) => deleteProject(p.id, e)} title={t('projects.delete')}>
                               <Trash2 size={12} />

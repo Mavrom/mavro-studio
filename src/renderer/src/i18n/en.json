@@ -112,7 +112,14 @@
     "items": "items",
     "info": "Project Info",
     "createdAt": "Added",
-    "save": "Save"
+    "save": "Save",
+    "duplicate": "Duplicate",
+    "overdue": "Overdue",
+    "exported": "Projects exported",
+    "sort": "Sort",
+    "sortManual": "Default order",
+    "sortName": "By name (A→Z)",
+    "sortDate": "By date (newest)"
   },
   "notes": {
     "title": "Notes & Snippets",

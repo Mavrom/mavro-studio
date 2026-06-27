@@ -112,7 +112,14 @@
     "items": "öğe",
     "info": "Proje Bilgileri",
     "createdAt": "Eklenme",
-    "save": "Kaydet"
+    "save": "Kaydet",
+    "duplicate": "Çoğalt",
+    "overdue": "Gecikmiş",
+    "exported": "Projeler dışa aktarıldı",
+    "sort": "Sırala",
+    "sortManual": "Varsayılan sıra",
+    "sortName": "İsme göre (A→Z)",
+    "sortDate": "Tarihe göre (yeni)"
   },
   "notes": {
     "title": "Notlar & Snippetler",
